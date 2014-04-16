@@ -1,4 +1,4 @@
-﻿// WinPie - Cydia-like APT Client for Windows
+﻿// Cygnus - Cydia-like APT Client for Windows
 // Copyright (C) 2014  PythEch
 //
 // This program is free software: you can redistribute it and/or modify
@@ -14,9 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace WinPie
+namespace Cygnus
 {
-    partial class frmMain
+    partial class MainForm
     {
         /// <summary>
         /// Required designer variable.
@@ -44,6 +44,9 @@ namespace WinPie
         /// </summary>
         private void InitializeComponent()
         {
+            XPTable.Models.DataSourceColumnBinder dataSourceColumnBinder1 = new XPTable.Models.DataSourceColumnBinder();
+            XPTable.Renderers.DragDropRenderer dragDropRenderer1 = new XPTable.Renderers.DragDropRenderer();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.tabMain = new System.Windows.Forms.TabControl();
             this.pageSource = new System.Windows.Forms.TabPage();
             this.btnReload = new System.Windows.Forms.Button();
@@ -56,8 +59,8 @@ namespace WinPie
             this.pagePackages = new System.Windows.Forms.TabPage();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.listPackages = new XPTable.Models.Table();
-            this.webBrowser1 = new System.Windows.Forms.WebBrowser();
             this.btnDownload = new System.Windows.Forms.Button();
+            this.webBrowser1 = new System.Windows.Forms.WebBrowser();
             this.btnSearch = new System.Windows.Forms.Button();
             this.txtSearch = new System.Windows.Forms.TextBox();
             this.pageChanges = new System.Windows.Forms.TabPage();
@@ -199,6 +202,7 @@ namespace WinPie
             this.splitContainer1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.splitContainer1.FixedPanel = System.Windows.Forms.FixedPanel.Panel2;
             this.splitContainer1.Location = new System.Drawing.Point(8, 32);
             this.splitContainer1.Name = "splitContainer1";
             // 
@@ -208,8 +212,8 @@ namespace WinPie
             // 
             // splitContainer1.Panel2
             // 
-            this.splitContainer1.Panel2.Controls.Add(this.webBrowser1);
             this.splitContainer1.Panel2.Controls.Add(this.btnDownload);
+            this.splitContainer1.Panel2.Controls.Add(this.webBrowser1);
             this.splitContainer1.Size = new System.Drawing.Size(473, 255);
             this.splitContainer1.SplitterDistance = 227;
             this.splitContainer1.TabIndex = 4;
@@ -218,16 +222,35 @@ namespace WinPie
             // 
             this.listPackages.BorderColor = System.Drawing.Color.Black;
             this.listPackages.DataMember = null;
+            this.listPackages.DataSourceColumnBinder = dataSourceColumnBinder1;
             this.listPackages.Dock = System.Windows.Forms.DockStyle.Fill;
+            dragDropRenderer1.ForeColor = System.Drawing.Color.Red;
+            this.listPackages.DragDropRenderer = dragDropRenderer1;
+            this.listPackages.FamilyRowSelect = true;
+            this.listPackages.FullRowSelect = true;
             this.listPackages.GridLinesContrainedToData = false;
             this.listPackages.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
             this.listPackages.Location = new System.Drawing.Point(0, 0);
             this.listPackages.Name = "listPackages";
             this.listPackages.NoItemsText = "";
+            this.listPackages.ShowSelectionRectangle = false;
             this.listPackages.Size = new System.Drawing.Size(227, 255);
             this.listPackages.TabIndex = 0;
             this.listPackages.UnfocusedBorderColor = System.Drawing.Color.Black;
             this.listPackages.SelectionChanged += new XPTable.Events.SelectionEventHandler(this.listPackages_SelectionChanged);
+            // 
+            // btnDownload
+            // 
+            this.btnDownload.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnDownload.Enabled = false;
+            this.btnDownload.Location = new System.Drawing.Point(3, 227);
+            this.btnDownload.Name = "btnDownload";
+            this.btnDownload.Size = new System.Drawing.Size(218, 25);
+            this.btnDownload.TabIndex = 5;
+            this.btnDownload.Text = "Download";
+            this.btnDownload.UseVisualStyleBackColor = true;
+            this.btnDownload.Click += new System.EventHandler(this.btnDownload_Click);
             // 
             // webBrowser1
             // 
@@ -235,29 +258,19 @@ namespace WinPie
             this.webBrowser1.Location = new System.Drawing.Point(0, 0);
             this.webBrowser1.MinimumSize = new System.Drawing.Size(20, 20);
             this.webBrowser1.Name = "webBrowser1";
+            this.webBrowser1.ScriptErrorsSuppressed = true;
             this.webBrowser1.Size = new System.Drawing.Size(242, 255);
             this.webBrowser1.TabIndex = 0;
-            this.webBrowser1.Url = new System.Uri("about:blank", System.UriKind.Absolute);
+            this.webBrowser1.Url = new System.Uri("", System.UriKind.Relative);
             this.webBrowser1.DocumentCompleted += new System.Windows.Forms.WebBrowserDocumentCompletedEventHandler(this.webBrowser1_DocumentCompleted);
-            // 
-            // btnDownload
-            // 
-            this.btnDownload.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnDownload.Enabled = false;
-            this.btnDownload.Location = new System.Drawing.Point(3, 229);
-            this.btnDownload.Name = "btnDownload";
-            this.btnDownload.Size = new System.Drawing.Size(77, 23);
-            this.btnDownload.TabIndex = 5;
-            this.btnDownload.Text = "Download";
-            this.btnDownload.UseVisualStyleBackColor = true;
-            this.btnDownload.Click += new System.EventHandler(this.btnDownload_Click);
+            this.webBrowser1.NewWindow += new System.ComponentModel.CancelEventHandler(this.webBrowser1_NewWindow);
             // 
             // btnSearch
             // 
             this.btnSearch.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSearch.Location = new System.Drawing.Point(404, 3);
+            this.btnSearch.Location = new System.Drawing.Point(404, 4);
             this.btnSearch.Name = "btnSearch";
-            this.btnSearch.Size = new System.Drawing.Size(77, 23);
+            this.btnSearch.Size = new System.Drawing.Size(77, 24);
             this.btnSearch.TabIndex = 3;
             this.btnSearch.Text = "Search";
             this.btnSearch.UseVisualStyleBackColor = true;
@@ -271,6 +284,7 @@ namespace WinPie
             this.txtSearch.Name = "txtSearch";
             this.txtSearch.Size = new System.Drawing.Size(392, 20);
             this.txtSearch.TabIndex = 2;
+            this.txtSearch.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtSearch_KeyDown);
             // 
             // pageChanges
             // 
@@ -329,19 +343,20 @@ namespace WinPie
             this.statusLabelZoom.Size = new System.Drawing.Size(73, 17);
             this.statusLabelZoom.Text = "Zoom: 100%";
             // 
-            // frmMain
+            // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(500, 348);
             this.Controls.Add(this.statusStrip);
             this.Controls.Add(this.tabMain);
-            this.Name = "frmMain";
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Name = "MainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "WinPie";
-            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.frmMain_FormClosed);
-            this.Load += new System.EventHandler(this.frmMain_Load);
-            this.Resize += new System.EventHandler(this.frmMain_Resize);
+            this.Text = "Cygnus";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainForm_FormClosed);
+            this.Load += new System.EventHandler(this.MainForm_Load);
+            this.Resize += new System.EventHandler(this.MainForm_Resize);
             this.tabMain.ResumeLayout(false);
             this.pageSource.ResumeLayout(false);
             this.pagePackages.ResumeLayout(false);

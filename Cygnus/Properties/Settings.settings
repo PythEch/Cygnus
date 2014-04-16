@@ -1,5 +1,5 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="WinPie.Properties" GeneratedClassName="Settings">
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Cygnus.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
     <Setting Name="zoomFactor" Type="System.Int32" Scope="User">
@@ -9,13 +9,13 @@
       <Value Profile="(Default)">Normal</Value>
     </Setting>
     <Setting Name="formSize" Type="System.Drawing.Size" Scope="User">
-      <Value Profile="(Default)">516, 387</Value>
+      <Value Profile="(Default)">649, 516</Value>
     </Setting>
     <Setting Name="tabSelectedIndex" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
-    <Setting Name="splitterDistanceRatio" Type="System.Single" Scope="User">
-      <Value Profile="(Default)">0.75</Value>
+    <Setting Name="webBrowserPanelWidth" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">350</Value>
     </Setting>
   </Settings>
 </SettingsFile>

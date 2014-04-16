@@ -7,8 +7,8 @@
     <ProjectGuid>{F5B6EBD3-E565-4FCC-83F6-B7545E7F9D82}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>WinPie</RootNamespace>
-    <AssemblyName>WinPie</AssemblyName>
+    <RootNamespace>Cygnus</RootNamespace>
+    <AssemblyName>Cygnus</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -32,6 +32,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Cygnus.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.XML" />
@@ -43,17 +46,20 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="frmMain.cs">
+    <Compile Include="MainForm.APT.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="frmMain.Designer.cs">
-      <DependentUpon>frmMain.cs</DependentUpon>
-    </Compile>
-    <Compile Include="loadingView.cs">
+    <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="loadingView.Designer.cs">
-      <DependentUpon>loadingView.cs</DependentUpon>
+    <Compile Include="MainForm.Designer.cs">
+      <DependentUpon>MainForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="LoadingView.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="LoadingView.Designer.cs">
+      <DependentUpon>LoadingView.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -62,25 +68,25 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="uiAlertView.cs">
+    <Compile Include="AlertView.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="uiAlertView.Designer.cs">
-      <DependentUpon>uiAlertView.cs</DependentUpon>
+    <Compile Include="AlertView.Designer.cs">
+      <DependentUpon>AlertView.cs</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="frmMain.resx">
-      <DependentUpon>frmMain.cs</DependentUpon>
+    <EmbeddedResource Include="MainForm.resx">
+      <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="loadingView.resx">
-      <DependentUpon>loadingView.cs</DependentUpon>
+    <EmbeddedResource Include="LoadingView.resx">
+      <DependentUpon>LoadingView.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="uiAlertView.resx">
-      <DependentUpon>uiAlertView.cs</DependentUpon>
+    <EmbeddedResource Include="AlertView.resx">
+      <DependentUpon>AlertView.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -123,6 +129,9 @@
       <Isolated>False</Isolated>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Cygnus.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

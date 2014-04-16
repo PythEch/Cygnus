@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace WinPie.Properties {
+namespace Cygnus.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
@@ -49,7 +49,7 @@ namespace WinPie.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("516, 387")]
+        [global::System.Configuration.DefaultSettingValueAttribute("649, 516")]
         public global::System.Drawing.Size formSize {
             get {
                 return ((global::System.Drawing.Size)(this["formSize"]));
@@ -73,13 +73,13 @@ namespace WinPie.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0.75")]
-        public float splitterDistanceRatio {
+        [global::System.Configuration.DefaultSettingValueAttribute("350")]
+        public int webBrowserPanelWidth {
             get {
-                return ((float)(this["splitterDistanceRatio"]));
+                return ((int)(this["webBrowserPanelWidth"]));
             }
             set {
-                this["splitterDistanceRatio"] = value;
+                this["webBrowserPanelWidth"] = value;
             }
         }
     }

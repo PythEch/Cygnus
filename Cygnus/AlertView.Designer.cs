@@ -1,4 +1,4 @@
-﻿// WinPie - Cydia-like APT Client for Windows
+﻿// Cygnus - Cydia-like APT Client for Windows
 // Copyright (C) 2014  PythEch
 //
 // This program is free software: you can redistribute it and/or modify
@@ -14,9 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace WinPie
+namespace Cygnus
 {
-    partial class uiAlertView
+    partial class AlertView
     {
         /// <summary>
         /// Required designer variable.
@@ -45,7 +45,7 @@ namespace WinPie
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(uiAlertView));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AlertView));
             this.txtSource = new System.Windows.Forms.TextBox();
             this.errorProvider1 = new System.Windows.Forms.ErrorProvider(this.components);
             this.btnEdit = new System.Windows.Forms.PictureBox();
@@ -58,24 +58,24 @@ namespace WinPie
             ((System.ComponentModel.ISupportInitialize)(this.btnAdd)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox)).BeginInit();
             this.SuspendLayout();
-            //
+            // 
             // txtSource
-            //
+            // 
             this.txtSource.Location = new System.Drawing.Point(17, 45);
             this.txtSource.Name = "txtSource";
             this.txtSource.Size = new System.Drawing.Size(190, 20);
             this.txtSource.TabIndex = 1;
             this.txtSource.Text = "http://";
             this.txtSource.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtSource_KeyDown);
-            //
+            // 
             // errorProvider1
-            //
+            // 
             this.errorProvider1.ContainerControl = this;
             this.errorProvider1.Icon = ((System.Drawing.Icon)(resources.GetObject("errorProvider1.Icon")));
-            //
+            // 
             // btnEdit
-            //
-            this.btnEdit.Image = global::WinPie.Properties.Resources.edit;
+            // 
+            this.btnEdit.Image = global::Cygnus.Properties.Resources.edit;
             this.btnEdit.Location = new System.Drawing.Point(-1, 80);
             this.btnEdit.Name = "btnEdit";
             this.btnEdit.Size = new System.Drawing.Size(113, 37);
@@ -83,10 +83,10 @@ namespace WinPie
             this.btnEdit.TabIndex = 4;
             this.btnEdit.TabStop = false;
             this.btnEdit.Click += new System.EventHandler(this.btnEdit_Click);
-            //
+            // 
             // btnCancel
-            //
-            this.btnCancel.Image = global::WinPie.Properties.Resources.cancel;
+            // 
+            this.btnCancel.Image = global::Cygnus.Properties.Resources.cancel;
             this.btnCancel.Location = new System.Drawing.Point(113, 80);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(113, 37);
@@ -94,10 +94,10 @@ namespace WinPie
             this.btnCancel.TabIndex = 3;
             this.btnCancel.TabStop = false;
             this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
-            //
+            // 
             // btnAdd
-            //
-            this.btnAdd.Image = global::WinPie.Properties.Resources.addsource;
+            // 
+            this.btnAdd.Image = global::Cygnus.Properties.Resources.addsource;
             this.btnAdd.Location = new System.Drawing.Point(-1, 80);
             this.btnAdd.Name = "btnAdd";
             this.btnAdd.Size = new System.Drawing.Size(113, 37);
@@ -105,19 +105,19 @@ namespace WinPie
             this.btnAdd.TabIndex = 2;
             this.btnAdd.TabStop = false;
             this.btnAdd.Click += new System.EventHandler(this.btnAdd_Click);
-            //
+            // 
             // pictureBox
-            //
-            this.pictureBox.Image = global::WinPie.Properties.Resources.alert;
+            // 
+            this.pictureBox.Image = global::Cygnus.Properties.Resources.alert;
             this.pictureBox.Location = new System.Drawing.Point(0, 0);
             this.pictureBox.Name = "pictureBox";
             this.pictureBox.Size = new System.Drawing.Size(225, 116);
             this.pictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
             this.pictureBox.TabIndex = 0;
             this.pictureBox.TabStop = false;
-            //
-            // uiAlertView
-            //
+            // 
+            // AlertView
+            // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(225, 116);
@@ -127,9 +127,10 @@ namespace WinPie
             this.Controls.Add(this.btnAdd);
             this.Controls.Add(this.pictureBox);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            this.Name = "uiAlertView";
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Name = "AlertView";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "uiAlertView";
+            this.Text = "Enter Cydia/APT URL";
             ((System.ComponentModel.ISupportInitialize)(this.errorProvider1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.btnEdit)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.btnCancel)).EndInit();

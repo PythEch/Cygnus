@@ -1,4 +1,4 @@
-﻿// WinPie - Cydia-like APT Client for Windows
+﻿// Cygnus - Cydia-like APT Client for Windows
 // Copyright (C) 2014  PythEch
 //
 // This program is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
 
-namespace WinPie
+namespace Cygnus
 {
     static class Program
     {
@@ -34,18 +34,9 @@ namespace WinPie
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Forms.frmMain = new frmMain();
-            Forms.uiAlertView = new uiAlertView();
-            Forms.loadingView = new loadingView();
-            Application.Run(Forms.frmMain);
+            Application.Run(new MainForm());
         }
 
     }
 
-    public static class Forms
-    {
-        public static frmMain frmMain;
-        public static uiAlertView uiAlertView;
-        public static loadingView loadingView;
-    }
 }

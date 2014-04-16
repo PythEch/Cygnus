@@ -1,4 +1,4 @@
-﻿// WinPie - Cydia-like APT Client for Windows
+﻿// Cygnus - Cydia-like APT Client for Windows
 // Copyright (C) 2014  PythEch
 //
 // This program is free software: you can redistribute it and/or modify
@@ -17,10 +17,9 @@
 using System;
 using System.Windows.Forms;
 
-namespace WinPie
+namespace Cygnus
 {
-
-    public partial class uiAlertView : Form
+    partial class AlertView : Form
     {
         //Credits: http://stackoverflow.com/questions/10674228/form-with-rounded-borders-in-c
 
@@ -34,7 +33,7 @@ namespace WinPie
             int nWidthEllipse, // height of ellipse
             int nHeightEllipse // width of ellipse
         );
-        public uiAlertView()
+        public AlertView()
         {
             InitializeComponent();
             Region = System.Drawing.Region.FromHrgn(CreateRoundRectRgn(0, 0, Width, Height, 15, 15));
@@ -43,33 +42,29 @@ namespace WinPie
         public bool canceled = false;
         private void btnAdd_Click(object sender, EventArgs e)
         {
-            if (txtSource.Text != "http://") //FIXME
+            if (Uri.IsWellFormedUriString(txtSource.Text, UriKind.Absolute))
             {
-                //Forms.frmMain.listSources.Items.Add(txtSource.Text).SubItems.Add("?");
-                //Forms.frmMain.SaveSettings();
                 canceled = false;
                 this.Close();
             }
             else
             {
                 errorProvider1.Clear();
-                errorProvider1.SetError(txtSource, "error!");
+                errorProvider1.SetError(txtSource, "URL is not valid!");
             }
         }
 
         private void btnEdit_Click(object sender, EventArgs e)
         {
-            if (txtSource.Text != "http://") //FIXME
+            if (Uri.IsWellFormedUriString(txtSource.Text, UriKind.Absolute))
             {
-                //Forms.frmMain.listSources.SelectedItems[0].Text = txtSource.Text;
-                //Forms.frmMain.SaveSettings();
                 canceled = false;
                 this.Close();
             }
             else
             {
                 errorProvider1.Clear();
-                errorProvider1.SetError(txtSource, "error!");
+                errorProvider1.SetError(txtSource, "URL is not valid!");
             }
         }
 
@@ -84,12 +79,12 @@ namespace WinPie
             if (e.KeyCode == Keys.Enter)
             {
                 if (btnAdd.Visible)
-                    btnAdd_Click(sender, EventArgs.Empty);
+                    btnAdd_Click(null, null);
                 else
-                    btnEdit_Click(sender, EventArgs.Empty);
+                    btnEdit_Click(null, null);
             }
             else if (e.KeyCode == Keys.Escape)
-                btnCancel_Click(sender, EventArgs.Empty);
+                btnCancel_Click(null, null);
         }
 
     }

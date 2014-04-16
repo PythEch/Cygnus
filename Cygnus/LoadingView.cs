@@ -1,4 +1,4 @@
-﻿// WinPie - Cydia-like APT Client for Windows
+﻿// Cygnus - Cydia-like APT Client for Windows
 // Copyright (C) 2014  PythEch
 //
 // This program is free software: you can redistribute it and/or modify
@@ -17,9 +17,9 @@
 using System;
 using System.Windows.Forms;
 
-namespace WinPie
+namespace Cygnus
 {
-    public partial class loadingView : Form
+    partial class LoadingView : Form
     {
 
         // Credits: http://stackoverflow.com/questions/10674228/form-with-rounded-borders-in-c
@@ -35,11 +35,12 @@ namespace WinPie
             int nHeightEllipse // width of ellipse
         );
 
-        public loadingView()
+        public LoadingView()
         {
             InitializeComponent();
             Region = System.Drawing.Region.FromHrgn(CreateRoundRectRgn(0, 0, Width, Height, 15, 15));
         }
+
     }
 
 
