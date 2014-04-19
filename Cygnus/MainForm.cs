@@ -1,4 +1,4 @@
-﻿// <copyright file="MainForm.APT.cs">
+﻿// <copyright file="MainForm.cs">
 //    Copyright (C) 2014  PythEch
 //
 //    This program is free software: you can redistribute it and/or modify
