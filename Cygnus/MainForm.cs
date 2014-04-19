@@ -41,9 +41,9 @@ namespace Cygnus
         /// Cell styles are just like CSS of the XPTable.
         /// These are global because it's unnecessary to re-initialize them everytime.
         /// </summary>
-        private static CellStyle titleStyle = new CellStyle() { Font = new Font("Microsoft Sans Serif", 11) };
-        private static CellStyle sectionStyle = new CellStyle() { Font = new Font("Microsoft Sans Serif", 7), ForeColor = Color.Gray };
-        private static CellStyle descriptionStyle = new CellStyle() { ForeColor = Color.Blue };
+        private static readonly CellStyle TitleStyle = new CellStyle() { Font = new Font("Microsoft Sans Serif", 11) };
+        private static readonly CellStyle SectionStyle = new CellStyle() { Font = new Font("Microsoft Sans Serif", 7), ForeColor = Color.Gray };
+        private static readonly CellStyle DescriptionStyle = new CellStyle() { ForeColor = Color.Blue };
 
         /// <summary>
         /// The latest selected package by the user.
@@ -201,7 +201,7 @@ namespace Cygnus
                 item.SubItems.Add(source.Element("Size").Value);
                 item.Tag = repoLabel;
 
-                allRepos.Add(new Repo { URL = repoUrl, Label = repoLabel });
+                allRepos.Add(new Repo() { URL = repoUrl, Label = repoLabel });
             }
         }
 
@@ -318,19 +318,19 @@ namespace Cygnus
         {
             Row row = new Row() { Height = 18 };
             row.Cells.Add(new Cell()); // using empty cell for now, I'm going to replace this with Cydia-like Section Icons
-            Cell cell = new Cell(pack.Name, titleStyle) { ForeColor = pack.Paid ? Color.Blue : Color.Black };
+            Cell cell = new Cell(pack.Name, TitleStyle) { ForeColor = pack.Paid ? Color.Blue : Color.Black };
             row.Cells.Add(cell);
             this.listPackages.TableModel.Rows.Add(row);
 
             Row subrow = new Row();
             subrow.Cells.Add(new Cell());
-            cell = new Cell(String.Format("from {0} ({1})", pack.Repo.Label, pack.Section), sectionStyle);
+            cell = new Cell(String.Format("from {0} ({1})", pack.Repo.Label, pack.Section), SectionStyle);
             subrow.Cells.Add(cell);
             row.SubRows.Add(subrow);
 
             subrow = new Row();
             subrow.Cells.Add(new Cell());
-            cell = new Cell(pack.Description, descriptionStyle);
+            cell = new Cell(pack.Description, DescriptionStyle);
             subrow.Cells.Add(cell);
             row.SubRows.Add(subrow);
 
@@ -425,7 +425,7 @@ namespace Cygnus
         /// Downloads the last selected package.
         /// </summary>
         /// <remarks>
-        /// This code is pretty much self-self-explanatory.
+        /// This code is pretty much self-explanatory.
         /// </remarks>
         private void btnDownload_Click(object sender, EventArgs e)
         {
@@ -436,13 +436,13 @@ namespace Cygnus
 
             Uri downloadURL = new Uri(new Uri(selectedPack.Repo.URL), selectedPack.Filename);
 
+            string dirPath = Path.Combine("debs", CleanFileName(selectedPack.Name));
+            string filePath = Path.Combine(dirPath, Path.GetFileName(downloadURL.LocalPath));
+
+            if (!Directory.Exists(dirPath)) Directory.CreateDirectory(dirPath);
+
             ShowLoadingView("Downloading File", () =>
             {
-                string dirPath = Path.Combine("debs", CleanFileName(selectedPack.Name));
-                string filePath = Path.Combine(dirPath, Path.GetFileName(downloadURL.LocalPath));
-
-                if (!Directory.Exists(dirPath)) Directory.CreateDirectory(dirPath);
-
                 DownloadFile(downloadURL, filePath);
 
                 if (selectedPack.Depends != null &&
@@ -486,9 +486,9 @@ namespace Cygnus
         /// <para>
         /// SelectionChanged event handler of listPackages.
         /// </para><para>
-        /// Basically this navigates to depiction and changed
-        /// selectedPack variable so btnDownload can determine
-        /// the latest selected package.
+        /// Basically, first this function navigates to the depiction of 
+        /// selected package. Then it changes selectedPack variable to make 
+        /// btnDownload can determine which package was selected.
         /// </para>
         /// </summary>
         private void listPackages_SelectionChanged(object sender, XPTable.Events.SelectionEventArgs e)
@@ -523,7 +523,7 @@ namespace Cygnus
         }
 
         /// <summary>
-        /// Resizes columns and hides/unhides Zoom controls according to the selected tab.
+        /// Makes zoom controls visible only in Packages tab and autoresizes columns.
         /// </summary>
         private void tabMain_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -573,8 +573,11 @@ namespace Cygnus
         }
 
         /// <summary>
-        /// It is necessary to zoom once after the first website is loaded.
-        /// Because the default zoom factor is obviously 100%.
+        /// The default zoom factor is 100% hence we need to zoom
+        /// once if the user preference is different than 100%.
+        /// I tried some other ways to do the exact same thing but 
+        /// this was the most reliable way. This event gets called
+        /// after every website is fully loaded.
         /// </summary>
         private void webBrowser1_DocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
         {
@@ -597,6 +600,7 @@ namespace Cygnus
 
         /// <summary>
         /// The scroll event handler of Zoom Trackbar.
+        /// Calls ZoomWebBrowser() right away.
         /// </summary>
         private void trackBarZoom_Scroll(object sender, EventArgs e)
         {

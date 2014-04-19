@@ -127,10 +127,10 @@ namespace Cygnus
         #region Methods
 
         /// <summary>
-        /// Removes invalid Filename chars from the argument.
+        /// Removes invalid filename chars from the argument.
         /// </summary>
         /// <param name="fileName">The filename to clean.</param>
-        /// <returns>Legal Filename.</returns>
+        /// <returns>The filename which is possible to create.</returns>
         /// <remarks>
         /// Credits: http://stackoverflow.com/a/7393722
         /// </remarks>
