@@ -26,6 +26,7 @@ namespace Cygnus
     using System.Windows.Forms;
     using System.Xml.Linq;
 
+    using Cygnus.Extensions;
     using XPTable.Models;
 
     /// <summary>
@@ -50,6 +51,11 @@ namespace Cygnus
         /// Used to download and display depiction.
         /// </summary>
         private static Package selectedPack;
+
+        /// <summary>
+        /// Used to store last selected package in Queue page.
+        /// </summary>
+        private static DownloadQueue selectedQueue;
 
         /// <summary>
         /// Used to zoom once after the first website is loaded to load user preferences.
@@ -78,16 +84,38 @@ namespace Cygnus
         /// </summary>
         private void InitializeXPTable()
         {
-            listPackages.SelectionStyle = SelectionStyle.Grid;
-            listPackages.EnableWordWrap = true;
+            // == Packages XPTable == //
+            this.tablePackages.SelectionStyle = SelectionStyle.Grid;
+            this.tablePackages.GridLines = GridLines.None;
+            this.tablePackages.EnableWordWrap = true;
 
-            listPackages.GridLines = GridLines.None;
             ImageColumn col1 = new ImageColumn(String.Empty, 20) { Editable = false, Resizable = false };
             TextColumn col2 = new TextColumn() { Editable = false, Resizable = false };
 
-            listPackages.ColumnModel = new ColumnModel(new Column[] { col1, col2 });
+            this.tablePackages.ColumnModel = new ColumnModel(new Column[] { col1, col2 });
+            this.tablePackages.TableModel = new TableModel();
 
-            listPackages.TableModel = new TableModel();
+            // == Changes XPTable == //
+            this.tableChanges.SelectionStyle = SelectionStyle.Grid;
+            this.tableChanges.GridLines = GridLines.None;
+            this.tableChanges.EnableWordWrap = true;
+
+            ImageColumn col3 = new ImageColumn(String.Empty, 20) { Editable = false, Resizable = false };
+            TextColumn col4 = new TextColumn() { Editable = false, Resizable = false };
+
+            this.tableChanges.ColumnModel = new ColumnModel(new Column[] { col3, col4 });
+            this.tableChanges.TableModel = new TableModel();
+
+            // == Queue XPTable == //
+            this.tableQueue.SelectionStyle = SelectionStyle.Grid;
+            this.tableQueue.GridLines = GridLines.Rows;
+            this.tableQueue.EnableWordWrap = true;
+
+            TextColumn col5 = new TextColumn() { Editable = false, Resizable = false };
+            ProgressBarColumn col6 = new ProgressBarColumn() { Editable = false, Resizable = false };
+
+            this.tableQueue.ColumnModel = new ColumnModel(new Column[] { col5, col6 });
+            this.tableQueue.TableModel = new TableModel() { RowHeight = 20 };
         }
 
         /// <summary>
@@ -108,7 +136,7 @@ namespace Cygnus
 
             alertView.ShowDialog();
 
-            return alertView.Canceled ? null : new Uri(alertView.txtSource.Text).ToString();
+            return alertView.Canceled ? null : alertView.txtSource.Text.toValidURL();
         }
 
         /// <summary>
@@ -116,16 +144,14 @@ namespace Cygnus
         /// </summary>
         /// <param name="loadingText">The text that is written below spinner.</param>
         /// <param name="action">The task (lambda) to run while <see cref="LoadingView"/> is being displayed.</param>
-        private void ShowLoadingView(string loadingText, Action action)
+        private async void ShowLoadingView(string loadingText, Action action)
         {
             var loadingView = new LoadingView();
 
             loadingView.label.Text = loadingText;
             loadingView.Text = loadingText;
 
-            var task = Task.Factory.StartNew(action);
-
-            task.ContinueWith((prevTask) =>
+            var task = Task.Factory.StartNew(action).ContinueWith((prevTask) =>
             {
                 this.Invoke((MethodInvoker)delegate
                 {
@@ -135,13 +161,7 @@ namespace Cygnus
 
             loadingView.ShowDialog();
 
-            if (task.IsFaulted)
-            {
-                foreach (var exception in task.Exception.InnerExceptions)
-                {
-                    throw exception;
-                }
-            }
+            await task; // unwraps exceptions automatically unlike Task.Wait()
         }
 
         /// <summary>
@@ -174,7 +194,6 @@ namespace Cygnus
 
             settings.windowState = (this.WindowState == FormWindowState.Maximized) ? FormWindowState.Maximized : FormWindowState.Normal;
             settings.zoomFactor = trackBarZoom.Value;
-
             settings.Save();
         }
 
@@ -192,7 +211,7 @@ namespace Cygnus
             var sources = XDocument.Load("Cygnus.xml").Element("Settings").Elements("Source");
             foreach (var source in sources)
             {
-                string repoUrl = new Uri(source.Element("URL").Value).ToString();
+                string repoUrl = source.Element("URL").Value.toValidURL();
                 string key = URLToFilename(repoUrl);
                 string repoLabel = source.Element("Label").Value;
 
@@ -274,7 +293,12 @@ namespace Cygnus
             this.listSources.Columns[0].Width = this.listSources.Width - 116; // Perfect constant
             this.listSources.Columns[1].AutoResize(ColumnHeaderAutoResizeStyle.HeaderSize);
 
-            this.listPackages.ColumnModel.Columns[1].Width = this.listPackages.Width - 41;
+            this.tablePackages.ColumnModel.Columns[1].Width = this.tablePackages.Width - 41;
+
+            this.tableChanges.ColumnModel.Columns[1].Width = this.tableChanges.Width - 41;
+
+            this.tableQueue.Refresh(); // this is necessary for some reason
+            this.tableQueue.AutoResizeColumnWidths();
         }
 
         /// <summary>
@@ -311,30 +335,66 @@ namespace Cygnus
         }
 
         /// <summary>
-        /// Adds a "Package" to the listPackages (XPTable).
+        /// Adds a "Package" to the tablePackages (XPTable).
         /// </summary>
         /// <param name="pack">Package to add.</param>
-        private void AddPkgToList(Package pack)
+        private void UpdatePackagesTable(Package pack)
         {
-            Row row = new Row() { Height = 18 };
+            Row row = new Row();
             row.Cells.Add(new Cell()); // using empty cell for now, I'm going to replace this with Cydia-like Section Icons
-            Cell cell = new Cell(pack.Name, TitleStyle) { ForeColor = pack.Paid ? Color.Blue : Color.Black };
-            row.Cells.Add(cell);
-            this.listPackages.TableModel.Rows.Add(row);
+            row.Cells.Add(new Cell(pack.Name, TitleStyle) { ForeColor = pack.Paid ? Color.Blue : Color.Black });
+            this.tablePackages.TableModel.Rows.Add(row);
 
             Row subrow = new Row();
             subrow.Cells.Add(new Cell());
-            cell = new Cell(String.Format("from {0} ({1})", pack.Repo.Label, pack.Section), SectionStyle);
-            subrow.Cells.Add(cell);
+            subrow.Cells.Add(new Cell("from {0} ({1})".FormatWith(pack.Repo.Label, pack.Section), SectionStyle));
             row.SubRows.Add(subrow);
 
             subrow = new Row();
             subrow.Cells.Add(new Cell());
-            cell = new Cell(pack.Description, DescriptionStyle);
-            subrow.Cells.Add(cell);
+            subrow.Cells.Add(new Cell(pack.Description, DescriptionStyle));
             row.SubRows.Add(subrow);
 
             row.Tag = pack;
+        }
+
+        /// <summary>
+        /// Adds a "Package" to the tableChanges.
+        /// </summary>
+        /// <param name="pack">Package to add.</param>
+        private void UpdateChangesTable(Package pack)
+        {
+            Row row = new Row() { Height = 18 };
+            row.Cells.Add(new Cell()); // using empty cell for now, I'm going to replace this with Cydia-like Section Icons
+            row.Cells.Add(new Cell(pack.Name, TitleStyle) { ForeColor = pack.Paid ? Color.Blue : Color.Black });
+            this.tableChanges.TableModel.Rows.Add(row);
+
+            Row subrow = new Row();
+            subrow.Cells.Add(new Cell());
+            subrow.Cells.Add(new Cell("from {0} ({1})".FormatWith(pack.Repo.Label, pack.Section), SectionStyle));
+            row.SubRows.Add(subrow);
+
+            subrow = new Row();
+            subrow.Cells.Add(new Cell());
+            subrow.Cells.Add(new Cell(pack.Description, DescriptionStyle));
+            row.SubRows.Add(subrow);
+        }
+
+        /// <summary>
+        /// Adds a Package to the tableQueue.
+        /// </summary>"
+        /// <param name="packName">Package name to display.</param>
+        /// <returns>The row index of the package.</returns>
+        private DownloadQueue UpdateQueueTable(string packName, Uri downloadUri)
+        {
+            Row row = new Row();
+            row.Cells.Add(new Cell(packName, TitleStyle)); // Package name text
+            row.Cells.Add(new Cell()); // Progressbar
+            this.tableQueue.TableModel.Rows.Add(row);
+
+            DownloadQueue queue = new DownloadQueue() { DownloadUri = downloadUri, TableRow = row };
+            row.Tag = queue;
+            return queue;
         }
 
         /// <summary>
@@ -347,7 +407,10 @@ namespace Cygnus
 
             if (url == null) return; // means it's cancelled
 
-            VerifyRepoURL(url.ToLowerInvariant(), this.listSources.Items.Add(String.Empty));
+            ListViewItem item = this.listSources.Items.Add(String.Empty);
+            bool verified = VerifyRepoURL(url, item);
+
+            if (!verified) item.Remove();
         }
 
         /// <summary>
@@ -363,7 +426,7 @@ namespace Cygnus
 
                 if (url == null) return;
 
-                VerifyRepoURL(url.ToLowerInvariant(), selectedItem);
+                VerifyRepoURL(url, selectedItem);
             }
         }
 
@@ -391,68 +454,98 @@ namespace Cygnus
             {
                 ReloadData();
             });
+
+            SaveXMLSettings();
         }
 
         /// <summary>
-        /// Searches packages by title. 
+        /// Searches packages by title.
         /// <see cref="MainForm.APT.SearchPackgesByName"/>
         /// </summary>
         private void btnSearch_Click(object sender, EventArgs e)
         {
-            this.btnDownload.Enabled = true;
-            this.listPackages.BeginUpdate();
-            this.listPackages.ClearAllData();
+            this.btnDownload.Enabled = this.btnDownloadFully.Enabled = true;
+            this.tablePackages.BeginUpdate();
+            this.tablePackages.ClearAllData();
 
             var searchList = SearchPackagesByName(txtSearch.Text);
 
             if (searchList.Count == 0)
             {
-                this.listPackages.NoItemsText = "No packages found...";
-                this.listPackages.EndUpdate();
-                this.btnDownload.Enabled = false;
+                this.tablePackages.NoItemsText = "No packages found...";
+                this.tablePackages.EndUpdate();
+                this.btnDownload.Enabled = this.btnDownloadFully.Enabled = false;
                 return;
             }
 
             foreach (var pack in searchList)
             {
-                AddPkgToList(pack);
+                UpdatePackagesTable(pack);
             }
 
-            this.listPackages.EndUpdate();
+            this.tablePackages.EndUpdate();
         }
 
         /// <summary>
-        /// Downloads the last selected package.
+        /// Downloads the last selected package asynchronously.
         /// </summary>
         /// <remarks>
         /// This code is pretty much self-explanatory.
         /// </remarks>
-        private void btnDownload_Click(object sender, EventArgs e)
+        private async void DownloadPackage(bool downloadDependencies)
         {
-            if (!Directory.Exists("debs")) Directory.CreateDirectory("debs");
+            Uri downloadUri = new Uri(new Uri(selectedPack.Repo.URL), selectedPack.Filename);
+            string selectedPackName = selectedPack.Name;
+            //Copy selectedPack locally to avoid problems with async
 
-            // TODO: Don't invoke LoadingView while downloading
-            // Make another GUI and support multiple downloads simultaneously
+            if (allQueues.Any(x => x.DownloadUri == downloadUri)) return;
+            // It's already in queue
 
-            Uri downloadURL = new Uri(new Uri(selectedPack.Repo.URL), selectedPack.Filename);
+            DownloadQueue queue = UpdateQueueTable(selectedPackName, downloadUri);
+            allQueues.Add(queue);
 
-            string dirPath = Path.Combine("debs", CleanFileName(selectedPack.Name));
-            string filePath = Path.Combine(dirPath, Path.GetFileName(downloadURL.LocalPath));
-
-            if (!Directory.Exists(dirPath)) Directory.CreateDirectory(dirPath);
-
-            ShowLoadingView("Downloading File", () =>
+            // Wait until the queue is finished
+            while (allQueues.IndexOf(queue) >= 1)
             {
-                DownloadFile(downloadURL, filePath);
+                await TaskEx.Delay(500); //500 ms optimal
+            }
 
-                if (selectedPack.Depends != null &&
-                    MessageBox.Show("Do you want to download dependencies of this package?",
-                                    "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            if (!allQueues.Contains(queue)) return;
+            //Prevent race condition that happens when user cancels the queue
+
+            string dirPath = Path.Combine("debs", ValidFilename(selectedPackName));
+            string filePath = Path.Combine(dirPath, Path.GetFileName(downloadUri.LocalPath));
+
+            Directory.CreateDirectory(dirPath);
+
+            statusBarProgressbar.Visible = true;
+            statusLabelDownload.Visible = true;
+
+            statusLabelDownload.Text = "0% Complete ({0})".FormatWith(selectedPackName);
+
+            await Task.Factory.StartNew(() =>
+            {
+                DownloadFileAndReportProgress(downloadUri, filePath, selectedPackName, queue.TableRow.Cells[1]);
+
+                if (downloadDependencies)
                 {
-                    // TODO: Use a proper way to ask this, e.g use seperate buttons
                     DownloadAllDependencies(selectedPack, dirPath);
                 }
             });
+
+            this.Text = "Cygnus";
+
+            allQueues.Remove(queue);
+        }
+
+        private async void btnDownload_Click(object sender, EventArgs e)
+        {
+            DownloadPackage(false);
+        }
+
+        private void btnDownloadFully_Click(object sender, EventArgs e)
+        {
+            DownloadPackage(true);
         }
 
         /// <summary>
@@ -465,20 +558,20 @@ namespace Cygnus
             webBrowser1.DocumentText = @"<html>
 <head><meta http-equiv='X-UA-Compatible' content='IE=edge'></head>
 <body>
-<iframe src='" + url + @"' style='border:0; position:absolute; top:0; left:0; right:0; bottom:0; width:100%; height:100%' />
+<iframe src='" + url.toValidURL() + @"' style='border:0; position:absolute; top:0; left:0; right:0; bottom:0; width:100%; height:100%' />
 </body>
 </html>";
             // Problem:
-            //     ieframe.dll based WebBrowser control loads webpages using IE7 compatibility mode by default
+            // ieframe.dll based WebBrowser control loads webpages using IE7 compatibility mode by default
             //
             // I've found this workaround by myself. This solves three problems:
-            //  • We won't need to have Administrator privileges and do a stupid registry trick:
+            // • We won't need to have Administrator privileges and do a stupid registry trick:
             // http://msdn.microsoft.com/en-us/library/ie/ee330730%28v=vs.85%29.aspx
             //
-            //  • And other than that, for some reason, this WebBrowser control doesn't render
+            // • And other than that, for some reason, this WebBrowser control doesn't render
             // Modmyi properly even after that trick.
             //
-            //  • And finally, we won't need to detect IE Version to set registry value correctly.
+            // • And finally, we won't need to detect IE Version to set registry value correctly.
             // It'll use the latest Version avaiable on the computer automatically
         }
 
@@ -486,8 +579,8 @@ namespace Cygnus
         /// <para>
         /// SelectionChanged event handler of listPackages.
         /// </para><para>
-        /// Basically, first this function navigates to the depiction of 
-        /// selected package. Then it changes selectedPack variable to make 
+        /// Basically, first this function navigates to the depiction of
+        /// selected package. Then it changes selectedPack variable to make
         /// btnDownload can determine which package was selected.
         /// </para>
         /// </summary>
@@ -501,23 +594,10 @@ namespace Cygnus
 
             string depiction = selectedPack.Depiction;
 
-            if (String.IsNullOrEmpty(depiction))
+            if (depiction.IsNullOrWhitespace())
             {
-                // IE7 sucks so bad I had to use that 'X-UA-Compatible' tag again.
-                webBrowser1.DocumentText = @"<html>
-<head><meta http-equiv='X-UA-Compatible' content='IE=edge'></head>
-<body>
-<h3 style='font-family:Arial; width:320px; height:0px; margin:auto; position:absolute; top:0; left:0; bottom:0; right:0'>No Depiction found for this package</h3>
-</body>
-</html>"; // Centers <h3> horizontally and vertically
-                return;
+                depiction = new Uri(new Uri("http://cydia.saurik.com/package/"), selectedPack.Pkg).ToString();
             }
-
-            // FIXME: Find a way to set Content-Type to 'text/html'
-            // Stupid IE tries to download iframe src sometimes
-
-            if (depiction.EndsWith("/"))
-                depiction += "index.html";
 
             NavigateWebBrowser(depiction);
         }
@@ -532,7 +612,8 @@ namespace Cygnus
             switch (tabMain.SelectedIndex)
             {
                 case 0: // Sources
-                case 2: // Changes
+                case 2: // Queue
+                case 3: // Changes
                     statusLabelZoom.Visible = false;
                     trackBarZoom.Visible = false;
                     break;
@@ -544,7 +625,7 @@ namespace Cygnus
         }
 
         /// <summary>
-        /// Zooms in and out of WebBrowser (IE) using SHDocVw which is 
+        /// Zooms in and out of WebBrowser (IE) using SHDocVw which is
         /// referenced as 'Microsoft Internet Controls' for human beings.
         /// </summary>
         /// <remarks>
@@ -554,28 +635,22 @@ namespace Cygnus
         {
             int zoomFactor = (this.trackBarZoom.Value <= 10) ? (this.trackBarZoom.Value * 10) : (this.trackBarZoom.Value == 11) ? 125 : 150;
 
-            statusLabelZoom.Text = String.Format("Zoom: {0}%", zoomFactor);
+            statusLabelZoom.Text = "Zoom: {0}%".FormatWith(zoomFactor);
 
             if (this.webBrowser1.Url == null) return;
-
-            // Saurik's site gets stuck at WebBrowserReadyState.Interactive for some reason
-            // The correct way is checking against WebBrowserReadyState.Complete
-            while (this.webBrowser1.ReadyState == WebBrowserReadyState.Uninitialized)
-            {
-                Application.DoEvents();
-            }
 
             ((SHDocVw.WebBrowser)this.webBrowser1.ActiveXInstance).ExecWB(
                 SHDocVw.OLECMDID.OLECMDID_OPTICAL_ZOOM,
                 SHDocVw.OLECMDEXECOPT.OLECMDEXECOPT_DONTPROMPTUSER,
                 zoomFactor,
                 IntPtr.Zero);
+
         }
 
         /// <summary>
         /// The default zoom factor is 100% hence we need to zoom
         /// once if the user preference is different than 100%.
-        /// I tried some other ways to do the exact same thing but 
+        /// I tried some other ways to do the exact same thing but
         /// this was the most reliable way. This event gets called
         /// after every website is fully loaded.
         /// </summary>
@@ -589,7 +664,7 @@ namespace Cygnus
         }
 
         /// <summary>
-        /// This prevents WebBrowser from opening (real) Internet Explorer and then 
+        /// This prevents WebBrowser from opening (real) Internet Explorer and then
         /// navigates to the clicked link.
         /// </summary>
         private void webBrowser1_NewWindow(object sender, System.ComponentModel.CancelEventArgs e)
@@ -605,6 +680,36 @@ namespace Cygnus
         private void trackBarZoom_Scroll(object sender, EventArgs e)
         {
             ZoomWebBrowser();
+        }
+
+        private void tableQueue_MouseDown(object sender, MouseEventArgs e)
+        {
+            Row row;
+            if (e.Button == System.Windows.Forms.MouseButtons.Right && (row = tableQueue.TableModel.RowAt(e.Y)) != null)
+            {
+                selectedQueue = (DownloadQueue)row.Tag;
+                contextMenuQueue.Show(Cursor.Position);
+            }
+        }
+
+        private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            allQueues.Remove(selectedQueue);
+
+            int? progressBarPercentage = (int?)selectedQueue.TableRow.Cells[1].Data;
+            if (progressBarPercentage.HasValue && progressBarPercentage != 100)
+            {
+                isDownloadCanceled = true;
+                statusBarProgressbar.Visible = statusLabelDownload.Visible = false;
+            }
+
+            tableQueue.TableModel.Rows.Remove(selectedQueue.TableRow);
+        }
+
+        private void openFolderToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string packName = selectedQueue.TableRow.Cells[0].Text;
+            System.Diagnostics.Process.Start("explorer.exe", Path.Combine("debs", packName));
         }
 
         /// <summary>

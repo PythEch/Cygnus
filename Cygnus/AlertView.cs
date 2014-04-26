@@ -80,16 +80,10 @@ namespace Cygnus
 
         private void btnEdit_Click(object sender, EventArgs e)
         {
-            if (Uri.IsWellFormedUriString(this.txtSource.Text, UriKind.Absolute))
-            {
-                this.Canceled = false;
-                this.Close();
-            }
-            else
-            {
-                errorProvider1.Clear();
-                errorProvider1.SetError(this.txtSource, "URL is not valid!");
-            }
+            btnAdd_Click(null, null);
+            // I want to do this explictly,
+            // yes I do know I could point Event handler
+            // to btnAdd_Click from the designer.
         }
 
         private void txtSource_KeyDown(object sender, KeyEventArgs e)

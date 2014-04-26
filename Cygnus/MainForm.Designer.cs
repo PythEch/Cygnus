@@ -47,8 +47,13 @@ namespace Cygnus
         /// </summary>
         private void InitializeComponent()
         {
-            XPTable.Models.DataSourceColumnBinder dataSourceColumnBinder1 = new XPTable.Models.DataSourceColumnBinder();
-            XPTable.Renderers.DragDropRenderer dragDropRenderer1 = new XPTable.Renderers.DragDropRenderer();
+            this.components = new System.ComponentModel.Container();
+            XPTable.Models.DataSourceColumnBinder dataSourceColumnBinder7 = new XPTable.Models.DataSourceColumnBinder();
+            XPTable.Renderers.DragDropRenderer dragDropRenderer7 = new XPTable.Renderers.DragDropRenderer();
+            XPTable.Models.DataSourceColumnBinder dataSourceColumnBinder8 = new XPTable.Models.DataSourceColumnBinder();
+            XPTable.Renderers.DragDropRenderer dragDropRenderer8 = new XPTable.Renderers.DragDropRenderer();
+            XPTable.Models.DataSourceColumnBinder dataSourceColumnBinder9 = new XPTable.Models.DataSourceColumnBinder();
+            XPTable.Renderers.DragDropRenderer dragDropRenderer9 = new XPTable.Renderers.DragDropRenderer();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.tabMain = new System.Windows.Forms.TabControl();
             this.pageSource = new System.Windows.Forms.TabPage();
@@ -61,17 +66,26 @@ namespace Cygnus
             this.btnAdd = new System.Windows.Forms.Button();
             this.pagePackages = new System.Windows.Forms.TabPage();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.listPackages = new XPTable.Models.Table();
+            this.tablePackages = new XPTable.Models.Table();
             this.btnDownload = new System.Windows.Forms.Button();
             this.webBrowser1 = new System.Windows.Forms.WebBrowser();
             this.btnSearch = new System.Windows.Forms.Button();
             this.txtSearch = new System.Windows.Forms.TextBox();
+            this.pageQueue = new System.Windows.Forms.TabPage();
+            this.tableQueue = new XPTable.Models.Table();
             this.pageChanges = new System.Windows.Forms.TabPage();
-            this.button3 = new System.Windows.Forms.Button();
+            this.tableChanges = new XPTable.Models.Table();
             this.trackBarZoom = new System.Windows.Forms.TrackBar();
             this.statusStrip = new System.Windows.Forms.StatusStrip();
+            this.statusBarProgressbar = new System.Windows.Forms.ToolStripProgressBar();
+            this.statusLabelDownload = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.statusLabelZoom = new System.Windows.Forms.ToolStripStatusLabel();
+            this.contextMenuQueue = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.openFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
+            this.btnDownloadFully = new System.Windows.Forms.Button();
             this.tabMain.SuspendLayout();
             this.pageSource.SuspendLayout();
             this.pagePackages.SuspendLayout();
@@ -79,16 +93,21 @@ namespace Cygnus
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.listPackages)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.tablePackages)).BeginInit();
+            this.pageQueue.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.tableQueue)).BeginInit();
             this.pageChanges.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.tableChanges)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarZoom)).BeginInit();
             this.statusStrip.SuspendLayout();
+            this.contextMenuQueue.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabMain
             // 
             this.tabMain.Controls.Add(this.pageSource);
             this.tabMain.Controls.Add(this.pagePackages);
+            this.tabMain.Controls.Add(this.pageQueue);
             this.tabMain.Controls.Add(this.pageChanges);
             this.tabMain.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabMain.Location = new System.Drawing.Point(0, 0);
@@ -135,10 +154,10 @@ namespace Cygnus
             this.listSources.FullRowSelect = true;
             this.listSources.GridLines = true;
             this.listSources.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
-            this.listSources.Location = new System.Drawing.Point(6, 3);
+            this.listSources.Location = new System.Drawing.Point(8, 6);
             this.listSources.MultiSelect = false;
             this.listSources.Name = "listSources";
-            this.listSources.Size = new System.Drawing.Size(399, 298);
+            this.listSources.Size = new System.Drawing.Size(399, 283);
             this.listSources.TabIndex = 0;
             this.listSources.UseCompatibleStateImageBehavior = false;
             this.listSources.View = System.Windows.Forms.View.Details;
@@ -211,45 +230,46 @@ namespace Cygnus
             // 
             // splitContainer1.Panel1
             // 
-            this.splitContainer1.Panel1.Controls.Add(this.listPackages);
+            this.splitContainer1.Panel1.Controls.Add(this.tablePackages);
             // 
             // splitContainer1.Panel2
             // 
+            this.splitContainer1.Panel2.Controls.Add(this.btnDownloadFully);
             this.splitContainer1.Panel2.Controls.Add(this.btnDownload);
             this.splitContainer1.Panel2.Controls.Add(this.webBrowser1);
             this.splitContainer1.Size = new System.Drawing.Size(473, 255);
             this.splitContainer1.SplitterDistance = 227;
             this.splitContainer1.TabIndex = 4;
             // 
-            // listPackages
+            // tablePackages
             // 
-            this.listPackages.BorderColor = System.Drawing.Color.Black;
-            this.listPackages.DataMember = null;
-            this.listPackages.DataSourceColumnBinder = dataSourceColumnBinder1;
-            this.listPackages.Dock = System.Windows.Forms.DockStyle.Fill;
-            dragDropRenderer1.ForeColor = System.Drawing.Color.Red;
-            this.listPackages.DragDropRenderer = dragDropRenderer1;
-            this.listPackages.FamilyRowSelect = true;
-            this.listPackages.FullRowSelect = true;
-            this.listPackages.GridLinesContrainedToData = false;
-            this.listPackages.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
-            this.listPackages.Location = new System.Drawing.Point(0, 0);
-            this.listPackages.Name = "listPackages";
-            this.listPackages.NoItemsText = "";
-            this.listPackages.ShowSelectionRectangle = false;
-            this.listPackages.Size = new System.Drawing.Size(227, 255);
-            this.listPackages.TabIndex = 0;
-            this.listPackages.UnfocusedBorderColor = System.Drawing.Color.Black;
-            this.listPackages.SelectionChanged += new XPTable.Events.SelectionEventHandler(this.listPackages_SelectionChanged);
+            this.tablePackages.BorderColor = System.Drawing.Color.Black;
+            this.tablePackages.ColumnResizing = false;
+            this.tablePackages.DataMember = null;
+            this.tablePackages.DataSourceColumnBinder = dataSourceColumnBinder7;
+            this.tablePackages.Dock = System.Windows.Forms.DockStyle.Fill;
+            dragDropRenderer7.ForeColor = System.Drawing.Color.Red;
+            this.tablePackages.DragDropRenderer = dragDropRenderer7;
+            this.tablePackages.FamilyRowSelect = true;
+            this.tablePackages.FullRowSelect = true;
+            this.tablePackages.GridLinesContrainedToData = false;
+            this.tablePackages.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
+            this.tablePackages.Location = new System.Drawing.Point(0, 0);
+            this.tablePackages.Name = "tablePackages";
+            this.tablePackages.NoItemsText = "";
+            this.tablePackages.ShowSelectionRectangle = false;
+            this.tablePackages.Size = new System.Drawing.Size(227, 255);
+            this.tablePackages.TabIndex = 0;
+            this.tablePackages.UnfocusedBorderColor = System.Drawing.Color.Black;
+            this.tablePackages.SelectionChanged += new XPTable.Events.SelectionEventHandler(this.listPackages_SelectionChanged);
             // 
             // btnDownload
             // 
-            this.btnDownload.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnDownload.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnDownload.Enabled = false;
             this.btnDownload.Location = new System.Drawing.Point(3, 227);
             this.btnDownload.Name = "btnDownload";
-            this.btnDownload.Size = new System.Drawing.Size(218, 25);
+            this.btnDownload.Size = new System.Drawing.Size(105, 25);
             this.btnDownload.TabIndex = 5;
             this.btnDownload.Text = "Download";
             this.btnDownload.UseVisualStyleBackColor = true;
@@ -264,7 +284,7 @@ namespace Cygnus
             this.webBrowser1.ScriptErrorsSuppressed = true;
             this.webBrowser1.Size = new System.Drawing.Size(242, 255);
             this.webBrowser1.TabIndex = 0;
-            this.webBrowser1.Url = new System.Uri("", System.UriKind.Relative);
+            this.webBrowser1.Url = new System.Uri("about:blank", System.UriKind.Absolute);
             this.webBrowser1.DocumentCompleted += new System.Windows.Forms.WebBrowserDocumentCompletedEventHandler(this.webBrowser1_DocumentCompleted);
             this.webBrowser1.NewWindow += new System.ComponentModel.CancelEventHandler(this.webBrowser1_NewWindow);
             // 
@@ -275,7 +295,7 @@ namespace Cygnus
             this.btnSearch.Name = "btnSearch";
             this.btnSearch.Size = new System.Drawing.Size(77, 24);
             this.btnSearch.TabIndex = 3;
-            this.btnSearch.Text = "Search";
+            this.btnSearch.Text = "&Search";
             this.btnSearch.UseVisualStyleBackColor = true;
             this.btnSearch.Click += new System.EventHandler(this.btnSearch_Click);
             // 
@@ -289,9 +309,45 @@ namespace Cygnus
             this.txtSearch.TabIndex = 2;
             this.txtSearch.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtSearch_KeyDown);
             // 
+            // pageQueue
+            // 
+            this.pageQueue.Controls.Add(this.tableQueue);
+            this.pageQueue.Location = new System.Drawing.Point(4, 22);
+            this.pageQueue.Name = "pageQueue";
+            this.pageQueue.Size = new System.Drawing.Size(492, 322);
+            this.pageQueue.TabIndex = 3;
+            this.pageQueue.Text = "Queue";
+            this.pageQueue.UseVisualStyleBackColor = true;
+            // 
+            // tableQueue
+            // 
+            this.tableQueue.AllowRMBSelection = true;
+            this.tableQueue.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tableQueue.BorderColor = System.Drawing.Color.Black;
+            this.tableQueue.ColumnResizing = false;
+            this.tableQueue.DataMember = null;
+            this.tableQueue.DataSourceColumnBinder = dataSourceColumnBinder8;
+            dragDropRenderer8.ForeColor = System.Drawing.Color.Red;
+            this.tableQueue.DragDropRenderer = dragDropRenderer8;
+            this.tableQueue.EnableHeaderContextMenu = false;
+            this.tableQueue.FamilyRowSelect = true;
+            this.tableQueue.FullRowSelect = true;
+            this.tableQueue.GridLinesContrainedToData = false;
+            this.tableQueue.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
+            this.tableQueue.Location = new System.Drawing.Point(8, 6);
+            this.tableQueue.Name = "tableQueue";
+            this.tableQueue.NoItemsText = "Queue is empty...";
+            this.tableQueue.ShowSelectionRectangle = false;
+            this.tableQueue.Size = new System.Drawing.Size(473, 281);
+            this.tableQueue.TabIndex = 1;
+            this.tableQueue.UnfocusedBorderColor = System.Drawing.Color.Black;
+            this.tableQueue.MouseDown += new System.Windows.Forms.MouseEventHandler(this.tableQueue_MouseDown);
+            // 
             // pageChanges
             // 
-            this.pageChanges.Controls.Add(this.button3);
+            this.pageChanges.Controls.Add(this.tableChanges);
             this.pageChanges.Location = new System.Drawing.Point(4, 22);
             this.pageChanges.Name = "pageChanges";
             this.pageChanges.Padding = new System.Windows.Forms.Padding(3);
@@ -300,16 +356,28 @@ namespace Cygnus
             this.pageChanges.Text = "Changes";
             this.pageChanges.UseVisualStyleBackColor = true;
             // 
-            // button3
+            // tableChanges
             // 
-            this.button3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.tableChanges.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.button3.Location = new System.Drawing.Point(8, 6);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(476, 23);
-            this.button3.TabIndex = 0;
-            this.button3.Text = "CODE IS OK, UI IS TO BE IMPLEMENTED";
-            this.button3.UseVisualStyleBackColor = true;
+            this.tableChanges.BorderColor = System.Drawing.Color.Black;
+            this.tableChanges.ColumnResizing = false;
+            this.tableChanges.DataMember = null;
+            this.tableChanges.DataSourceColumnBinder = dataSourceColumnBinder9;
+            dragDropRenderer9.ForeColor = System.Drawing.Color.Red;
+            this.tableChanges.DragDropRenderer = dragDropRenderer9;
+            this.tableChanges.FamilyRowSelect = true;
+            this.tableChanges.FullRowSelect = true;
+            this.tableChanges.GridLinesContrainedToData = false;
+            this.tableChanges.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
+            this.tableChanges.Location = new System.Drawing.Point(8, 6);
+            this.tableChanges.Name = "tableChanges";
+            this.tableChanges.NoItemsText = "No changes found...";
+            this.tableChanges.ShowSelectionRectangle = false;
+            this.tableChanges.Size = new System.Drawing.Size(473, 281);
+            this.tableChanges.TabIndex = 1;
+            this.tableChanges.UnfocusedBorderColor = System.Drawing.Color.Black;
             // 
             // trackBarZoom
             // 
@@ -326,25 +394,85 @@ namespace Cygnus
             // 
             // statusStrip
             // 
+            this.statusStrip.AutoSize = false;
             this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.statusBarProgressbar,
+            this.statusLabelDownload,
             this.toolStripStatusLabel1,
             this.statusLabelZoom});
-            this.statusStrip.Location = new System.Drawing.Point(0, 326);
+            this.statusStrip.Location = new System.Drawing.Point(0, 322);
             this.statusStrip.Name = "statusStrip";
-            this.statusStrip.Size = new System.Drawing.Size(500, 22);
+            this.statusStrip.Size = new System.Drawing.Size(500, 26);
             this.statusStrip.TabIndex = 1;
+            // 
+            // statusBarProgressbar
+            // 
+            this.statusBarProgressbar.Name = "statusBarProgressbar";
+            this.statusBarProgressbar.Size = new System.Drawing.Size(100, 20);
+            this.statusBarProgressbar.Visible = false;
+            // 
+            // statusLabelDownload
+            // 
+            this.statusLabelDownload.Name = "statusLabelDownload";
+            this.statusLabelDownload.Size = new System.Drawing.Size(111, 21);
+            this.statusLabelDownload.Text = "{0}% Complete ({1})";
+            this.statusLabelDownload.Visible = false;
             // 
             // toolStripStatusLabel1
             // 
             this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
-            this.toolStripStatusLabel1.Size = new System.Drawing.Size(412, 17);
+            this.toolStripStatusLabel1.Size = new System.Drawing.Size(416, 21);
             this.toolStripStatusLabel1.Spring = true;
             // 
             // statusLabelZoom
             // 
             this.statusLabelZoom.Name = "statusLabelZoom";
-            this.statusLabelZoom.Size = new System.Drawing.Size(73, 17);
-            this.statusLabelZoom.Text = "Zoom: 100%";
+            this.statusLabelZoom.Size = new System.Drawing.Size(69, 21);
+            this.statusLabelZoom.Text = "Zoom: {0}%";
+            // 
+            // contextMenuQueue
+            // 
+            this.contextMenuQueue.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.deleteToolStripMenuItem,
+            this.openFolderToolStripMenuItem});
+            this.contextMenuQueue.Name = "contextMenuQueue";
+            this.contextMenuQueue.Size = new System.Drawing.Size(198, 48);
+            // 
+            // deleteToolStripMenuItem
+            // 
+            this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
+            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(197, 22);
+            this.deleteToolStripMenuItem.Text = "Delete";
+            this.deleteToolStripMenuItem.Click += new System.EventHandler(this.deleteToolStripMenuItem_Click);
+            // 
+            // openFolderToolStripMenuItem
+            // 
+            this.openFolderToolStripMenuItem.Name = "openFolderToolStripMenuItem";
+            this.openFolderToolStripMenuItem.Size = new System.Drawing.Size(197, 22);
+            this.openFolderToolStripMenuItem.Text = "Open containing folder";
+            this.openFolderToolStripMenuItem.Click += new System.EventHandler(this.openFolderToolStripMenuItem_Click);
+            // 
+            // toolStripDropDownButton1
+            // 
+            this.toolStripDropDownButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.toolStripDropDownButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButton1.Image")));
+            this.toolStripDropDownButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripDropDownButton1.Name = "toolStripDropDownButton1";
+            this.toolStripDropDownButton1.Size = new System.Drawing.Size(29, 20);
+            this.toolStripDropDownButton1.Text = "toolStripDropDownButton1";
+            // 
+            // btnDownloadFully
+            // 
+            this.btnDownloadFully.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnDownloadFully.AutoEllipsis = true;
+            this.btnDownloadFully.Enabled = false;
+            this.btnDownloadFully.Location = new System.Drawing.Point(114, 227);
+            this.btnDownloadFully.Name = "btnDownloadFully";
+            this.btnDownloadFully.Size = new System.Drawing.Size(105, 25);
+            this.btnDownloadFully.TabIndex = 6;
+            this.btnDownloadFully.Text = "Download Fully";
+            this.btnDownloadFully.UseVisualStyleBackColor = true;
+            this.btnDownloadFully.Click += new System.EventHandler(this.btnDownloadFully_Click);
             // 
             // MainForm
             // 
@@ -368,13 +496,16 @@ namespace Cygnus
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.listPackages)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.tablePackages)).EndInit();
+            this.pageQueue.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.tableQueue)).EndInit();
             this.pageChanges.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.tableChanges)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarZoom)).EndInit();
             this.statusStrip.ResumeLayout(false);
             this.statusStrip.PerformLayout();
+            this.contextMenuQueue.ResumeLayout(false);
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
@@ -392,15 +523,24 @@ namespace Cygnus
         public System.Windows.Forms.ListView listSources;
         private System.Windows.Forms.Button btnReload;
         private System.Windows.Forms.TabPage pageChanges;
-        private XPTable.Models.Table listPackages;
+        private XPTable.Models.Table tablePackages;
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.Button btnSearch;
         private System.Windows.Forms.TextBox txtSearch;
-        private System.Windows.Forms.Button button3;
         private System.Windows.Forms.Button btnDownload;
         private System.Windows.Forms.TrackBar trackBarZoom;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
         private System.Windows.Forms.ToolStripStatusLabel statusLabelZoom;
         private System.Windows.Forms.WebBrowser webBrowser1;
+        private System.Windows.Forms.ToolStripProgressBar statusBarProgressbar;
+        private System.Windows.Forms.ToolStripStatusLabel statusLabelDownload;
+        private System.Windows.Forms.TabPage pageQueue;
+        private XPTable.Models.Table tableQueue;
+        private XPTable.Models.Table tableChanges;
+        private System.Windows.Forms.ContextMenuStrip contextMenuQueue;
+        private System.Windows.Forms.ToolStripMenuItem deleteToolStripMenuItem;
+        private System.Windows.Forms.ToolStripDropDownButton toolStripDropDownButton1;
+        private System.Windows.Forms.ToolStripMenuItem openFolderToolStripMenuItem;
+        private System.Windows.Forms.Button btnDownloadFully;
     }
 }

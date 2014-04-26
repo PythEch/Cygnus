@@ -28,6 +28,9 @@ namespace Cygnus
     using System.Text.RegularExpressions;
     using System.Windows.Forms;
 
+    using Cygnus.Extensions;
+    using XPTable.Models;
+
     /// <content>
     /// Contains APT related parts of MainForm
     /// </content>
@@ -39,7 +42,7 @@ namespace Cygnus
         /// Default packages installed by evasi0n7 jailbreak.
         /// We don't want to download these packages as dependencies.
         /// </summary>
-        private static readonly string[] DefaultPackages = 
+        private static readonly string[] DefaultPackages =
         {
             "apr-lib",
             "apt7-key",
@@ -82,15 +85,15 @@ namespace Cygnus
         /// <remarks>
         /// So finally you can add thebigboss to your sources without hassle!
         /// </remarks>
-        private static readonly Dictionary<string, string> KnownSources = new Dictionary<string, string> 
+        private static readonly Dictionary<string, string> KnownSources = new Dictionary<string, string>
         {
             { "bigboss", "http://apt.thebigboss.org/repofiles/cydia/" }, // Y U NO CREATE SYMLINK :(
-            { "zodttd", "http://cydia.zodttd.com/Repo/cydia/" },
+            { "zodttd", "http://cydia.zodttd.com/repo/cydia/" },
             { "modmyi", "http://apt.modmyi.com/" },
             { "saurik", "http://apt.saurik.com/" },
             { "ultrasn0w", "http://repo666.ultrasn0w.com/" },
-            { "rpetri", "http://rpetri.ch/Repo/" },
-            { "filippobiga", "http://filippobiga.me/Repo/" },
+            { "rpetri", "http://rpetri.ch/repo/" },
+            { "filippobiga", "http://filippobiga.me/repo/" },
             { "getdelta", "http://getdelta.co/" },
             { "if0rce", "http://apt.if0rce.com/" },
             { "angelxwind", "http://cydia.angelxwind.net/" },
@@ -111,9 +114,9 @@ namespace Cygnus
         /// Yo dawg, I heard you like exceptions, so I put an exception in yo exception array!
         /// </para>
         /// </remarks>
-        private static readonly string[] OldRepos = new string[] 
+        private static readonly string[] OldRepos = new string[]
         {
-            "http://apt.thebigboss.org/repofiles/cydia/", "http://apt.modmyi.com/", "http://cydia.zodttd.com/Repo/cydia/",
+            "http://apt.thebigboss.org/repofiles/cydia/", "http://apt.modmyi.com/", "http://cydia.zodttd.com/repo/cydia/",
             "http://apt.saurik.com/"
         };
 
@@ -121,6 +124,14 @@ namespace Cygnus
         /// Stores all repos on memory to access later.
         /// </summary>
         private static List<Repo> allRepos = new List<Repo> { };
+
+        /// <summary>
+        /// Used to download packages simultaneously.
+        /// Stores the first Uri in the queue.
+        /// </summary>
+        private static List<DownloadQueue> allQueues = new List<DownloadQueue> { };
+
+        private static bool isDownloadCanceled = false;
 
         #endregion Fields
 
@@ -131,12 +142,9 @@ namespace Cygnus
         /// </summary>
         /// <param name="fileName">The filename to clean.</param>
         /// <returns>The filename which is possible to create.</returns>
-        /// <remarks>
-        /// Credits: http://stackoverflow.com/a/7393722
-        /// </remarks>
-        private static string CleanFileName(string fileName)
+        private static string ValidFilename(string filename)
         {
-            return Path.GetInvalidFileNameChars().Aggregate(fileName, (current, c) => current.Replace(c.ToString(), String.Empty));
+            return new String(filename.Where(x => !Path.GetInvalidFileNameChars().Contains(x)).ToArray());
         }
 
         /// <summary>
@@ -177,16 +185,34 @@ namespace Cygnus
         /// Very fast and easy way to decompress bz2 archives.
         /// Managed DLLs are just too slow.
         /// </remarks>
-        private static void ExtractZip(string zipName)
+        private void ExtractZip(string zipName)
         {
             if (!File.Exists("repos\\7za.exe")) ExtractResource("Cygnus.7za.exe", "repos\\7za.exe");
 
-            ProcessStartInfo startInfo = new ProcessStartInfo("repos\\7za.exe", "x -orepos -y repos\\" + zipName);
+            //Extract archive to repos\temp directory first.
+            //Because sometimes it is necessary to rename extracted files.
+
+            ProcessStartInfo startInfo = new ProcessStartInfo("repos\\7za.exe", "x -orepos\\temp -y repos\\" + zipName);
             startInfo.RedirectStandardOutput = true;
             startInfo.UseShellExecute = false;
             startInfo.CreateNoWindow = true;
 
             Process.Start(startInfo).WaitForExit();
+
+            //Rename/Move the extracted file.
+
+            string sourceFilePath = Directory.GetFiles("repos\\temp")[0];
+            string targetFilePath = "repos\\" + Path.GetFileNameWithoutExtension(zipName);
+
+            if (File.Exists(targetFilePath))
+            {
+                CompareChanges(sourceFilePath, targetFilePath);
+                File.Delete(targetFilePath);
+            }
+
+            File.Move(sourceFilePath, targetFilePath);
+
+            Directory.Delete("repos\\temp", true); //Clean up the mess
         }
 
         /// <summary>
@@ -208,7 +234,7 @@ namespace Cygnus
                     return response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.Found;
                 }
             }
-            catch
+            catch (WebException)
             {
                 return false;
             }
@@ -230,15 +256,23 @@ namespace Cygnus
             //some repos require this for some reason
             //TODO: use pseudo-random ID to prevent being banned from some repos in the future
 
-            using (Stream responseStream = request.GetResponse().GetResponseStream())
+            try
             {
-                byte[] buffer = new byte[4096];
-                int bytesRead = 0;
-
-                while ((bytesRead = responseStream.Read(buffer, 0, buffer.Length)) != 0)
+                using (Stream responseStream = request.GetResponse().GetResponseStream())
                 {
-                    stream.Write(buffer, 0, bytesRead);
+                    byte[] buffer = new byte[4096];
+                    int bytesRead = 0;
+
+                    while ((bytesRead = responseStream.Read(buffer, 0, buffer.Length)) != 0)
+                    {
+                        stream.Write(buffer, 0, bytesRead);
+                    }
                 }
+            }
+            catch (WebException webEx)
+            {
+                MessageBox.Show("An error occured while downloading from url: {0}\n\n{1}".FormatWith(uri.ToString(), webEx.Message),
+                                "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -256,12 +290,64 @@ namespace Cygnus
         }
 
         /// <summary>
+        /// Downloads a file from web and reports the progress to progressbar.
+        /// </summary>
+        /// <param name="uri">The URL to download.</param>
+        /// <param name="path">The path where the file's going to be downloaded.</param>
+        private void DownloadFileAndReportProgress(Uri uri, string path, string packageName, Cell progressBarCell)
+        {
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
+            request.Method = WebRequestMethods.Http.Get;
+            request.UserAgent = "Telesphoreo APT-HTTP/1.0.592";
+            request.Headers.Add("X-Unique-ID", "0000000000000000000000000000000000000000");
+
+            try
+            {
+                using (WebResponse response = request.GetResponse())
+                {
+                    float fileSize = (float)response.ContentLength;
+
+                    using (Stream fileStream = File.Create(path))
+                    using (Stream responseStream = response.GetResponseStream())
+                    {
+                        byte[] buffer = new byte[4096];
+                        int bytesRead = 0;
+                        int totalBytesRead = 0;
+
+                        while ((bytesRead = responseStream.Read(buffer, 0, buffer.Length)) != 0 && !isDownloadCanceled)
+                        {
+                            fileStream.Write(buffer, 0, bytesRead);
+
+                            totalBytesRead += bytesRead;
+
+                            this.BeginInvoke((MethodInvoker)delegate
+                            {
+                                int percent = (int)((float)totalBytesRead / fileSize * 100.0f);
+                                statusBarProgressbar.Value = percent;
+                                statusLabelDownload.Text = "{0}% Complete ({1})".FormatWith(percent, packageName);
+                                progressBarCell.Data = percent;
+                                this.Text = "Cygnus - {0}% Complete".FormatWith(percent);
+                            });
+                        }
+                    }
+                }
+            }
+            catch (WebException webEx)
+            {
+                MessageBox.Show("An error occured while downloading from url: {0}\n\n{1}".FormatWith(uri.ToString(), webEx.Message),
+                                "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
+            isDownloadCanceled = false;
+        }
+
+        /// <summary>
         /// Downloads repository's CydiaIcon.png, the logo you see in Cydia>Manage>Sources.
         /// </summary>
         /// <param name="repoURL">The Repo's URL</param>
         private static void DownloadCydiaIcon(string repoURL)
         {
-            if (!Directory.Exists("repos")) Directory.CreateDirectory("repos");
+            Directory.CreateDirectory("repos");
 
             Uri iconUri;
 
@@ -295,6 +381,8 @@ namespace Cygnus
             else
                 releaseUri = new Uri(new Uri(repoURL), "Release");
 
+            if (!RemoteUriExists(releaseUri)) return null;
+
             using (MemoryStream memoryStream = new MemoryStream())
             {
                 DownloadFile(releaseUri, memoryStream);
@@ -319,9 +407,9 @@ namespace Cygnus
         /// <summary>
         /// Re-downloads packages lists from repositories akin to 'apt-get update'
         /// </summary>
-        private static void ReloadData()
+        private void ReloadData()
         {
-            if (!Directory.Exists("repos")) Directory.CreateDirectory("repos");
+            Directory.CreateDirectory("repos");
 
             foreach (var repo in allRepos)
             {
@@ -331,14 +419,10 @@ namespace Cygnus
                 if (repo.URL == "http://apt.saurik.com/")
                 {
                     packagesUri = new Uri(new Uri(repo.URL), "dists/ios/main/binary-iphoneos-arm/Packages.bz2");
-                    if (!RemoteUriExists(packagesUri))
-                        continue;
                 }
                 else if (OldRepos.Contains(repo.URL))
                 {
                     packagesUri = new Uri(new Uri(repo.URL), "dists/stable/main/binary-iphoneos-arm/Packages.bz2");
-                    if (!RemoteUriExists(packagesUri))
-                        continue;
                 }
                 else
                 {
@@ -347,10 +431,11 @@ namespace Cygnus
                     {
                         packagesUri = new Uri(new Uri(repo.URL), "Packages.gz");
                         bz2Archive = false;
-                        if (!RemoteUriExists(packagesUri))
-                            continue;
                     }
                 }
+
+                if (!RemoteUriExists(packagesUri))
+                    continue;
 
                 string fileName = URLToFilename(repo.URL) + ".Packages" + (bz2Archive ? ".bz2" : ".gz");
 
@@ -360,11 +445,25 @@ namespace Cygnus
                 }
                 catch (WebException webEx)
                 {
-                    MessageBox.Show(String.Format("An error occured while reloading data from repo: {0}\n\n{1}", repo.URL, webEx.Message),
+                    MessageBox.Show("An error occured while reloading data from repo: {0}\n\n{1}".FormatWith(repo.URL, webEx.Message),
                                     "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
 
                 ExtractZip(fileName);
+
+                string path = "repos\\" + Path.GetFileNameWithoutExtension(fileName);
+
+                if (File.Exists(path))
+                {
+                    int repoIndex = allRepos.IndexOf(repo);
+                    int numberOfPackages = File.ReadLines(path).Count(line => line.StartsWith("Package:"));
+
+                    this.BeginInvoke((MethodInvoker)delegate
+                    {
+                        listSources.Items[repoIndex].SubItems[1].Text = numberOfPackages.ToString();
+                    });
+                }
+
                 File.Delete("repos\\" + fileName);
             }
         }
@@ -378,11 +477,11 @@ namespace Cygnus
         /// <returns>List of Packages that matches the criteria.</returns>
         /// <remarks>
         /// <para>
-        /// Can be optimized further, 
+        /// Can be optimized further,
         /// like removing the Select() and checking if the package Name contains the argument
         /// on the fly and then adding it to the 'packages' List
         /// </para><para>
-        /// String.Split bites my CPU but, do we need optimization though? 
+        /// String.Split bites my CPU but, do we need optimization though?
         /// It's already a lot faster than iOS/Cydia on my cheap dual core computer
         /// </para>
         /// </remarks>
@@ -452,9 +551,9 @@ namespace Cygnus
                                 break;
                         }
                     }
-                    else if (string.IsNullOrWhiteSpace(key))
+                    else if (key.IsNullOrWhitespace())
                     {
-                        if (!string.IsNullOrWhiteSpace(pack.Name) && pack.Name.ToLowerInvariant().Contains(packageNameToSearch))
+                        if (!pack.Name.IsNullOrWhitespace() && pack.Name.ContainsIgnoreCase(packageNameToSearch))
                         {
                             pack.Repo = repo;
                             packages.Add(pack);
@@ -465,11 +564,11 @@ namespace Cygnus
                 } // end foreach (var substrings in query)
 
                 // Add the last one if we missed one
-                if (!string.IsNullOrWhiteSpace(pack.Pkg) && string.IsNullOrWhiteSpace(pack.Name) && pack.Name.ToLowerInvariant().Contains(packageNameToSearch))
+                if (!pack.Pkg.IsNullOrWhitespace() && !pack.Name.IsNullOrWhitespace() && pack.Name.ContainsIgnoreCase(packageNameToSearch))
                 {
                     packages.Add(pack);
                 }
-            } // end foreach (ListViewItem item in listSources.Items)
+            } // end foreach (var repo in allRepos)
 
             return packages;
         }
@@ -526,13 +625,28 @@ namespace Cygnus
                             break;
                         }
 
-                        string key = substrings[0];
+                        string key = substrings[0].Trim();
                         string value = substrings[1].Trim();
 
-                        switch (key.Trim())
+                        switch (key)
                         {
+                            case "Package":
+                                pack.Pkg = value;
+                                break;
+                            case "Name":
+                                pack.Name = value;
+                                break;
+                            case "Version":
+                                pack.Version = value;
+                                break;
+                            case "Description":
+                                pack.Description = value;
+                                break;
                             case "Filename":
                                 pack.Filename = value;
+                                break;
+                            case "Section":
+                                pack.Section = value;
                                 break;
                             case "Pre-Depends":
                             case "Depends":
@@ -540,6 +654,12 @@ namespace Cygnus
                                 break;
                             case "MD5sum":
                                 pack.MD5sum = value;
+                                break;
+                            case "Depiction":
+                                pack.Depiction = value;
+                                break;
+                            case "Tag":
+                                pack.Paid = value.Contains("cydia::commercial");
                                 break;
                         }
                     }
@@ -554,7 +674,7 @@ namespace Cygnus
         /// </summary>
         /// <param name="pack">The package of which dependencies are going be downloaded.</param>
         /// <param name="dirPath">The path of the directory where files are going to be saved.</param>
-        private static void DownloadAllDependencies(Package pack, string dirPath)
+        private void DownloadAllDependencies(Package pack, string dirPath)
         {
             if (pack.Depends == null) return;
 
@@ -565,14 +685,22 @@ namespace Cygnus
             foreach (var dependency in depends.Where(x => !DefaultPackages.Contains(x)))
             {
                 Package dependencyPack = SearchPackagesByID(dependency);
-                if (dependencyPack.Pkg == null) return;
+                if (dependencyPack.Pkg == null) return; // Search failed!
+                // TODO: Inform user about this issue.
+
                 Uri uri = new Uri(new Uri(dependencyPack.Repo.URL), dependencyPack.Filename);
+
+                // Add to queue
+                ////DownloadQueue queue = UpdateQueueTable(pack.Name, uri);
+                ////allQueues.Add(queue);
 
                 string downloadPath = Path.Combine(dirPath, Path.GetFileName(uri.LocalPath));
 
                 if (File.Exists(downloadPath)) return;
 
                 DownloadFile(uri, downloadPath);
+
+                ////DownloadFileAndReportProgress(uri, downloadPath, pack.Name, queue.TableRow.Cells[1]);
 
                 DownloadAllDependencies(dependencyPack, dirPath); //yay! recursion
             }
@@ -584,10 +712,15 @@ namespace Cygnus
         /// </summary>
         /// <param name="url">The Repo's url.</param>
         /// <param name="item">The ListViewItem to edit.</param>
-        private void VerifyRepoURL(string url, ListViewItem item)
+        private bool VerifyRepoURL(string url, ListViewItem item)
         {
+            // Thanks to @Taconut for this suggestion :)
+            if (!url.EndsWith("/"))
+                url += "/";
+
+            url = url.toValidURL();
             // zodttd has two repos actually
-            if (new Uri(url).ToString() != "http://cydiabetas.zodttd.com/")
+            if (url != "http://cydiabetas.zodttd.com/")
             {
                 foreach (var source in KnownSources)
                 {
@@ -605,10 +738,11 @@ namespace Cygnus
 
             Uri uri = new Uri(url);
 
-            if (allRepos.FirstOrDefault(x => x.URL == uri.ToString()) != null)
+
+            if (allRepos.Any(x => x.URL == uri.ToString()))
             {
                 MessageBox.Show("The repository you've entered already exists!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
+                return false;
             }
 
             ShowLoadingView("Verifying URL", () =>
@@ -617,7 +751,7 @@ namespace Cygnus
                 {
                     verified = true;
                     DownloadCydiaIcon(uri.ToString());
-                    label = DownloadRelease(uri.ToString());
+                    label = DownloadRelease(uri.ToString()) ?? URLToFilename(uri.ToString());
                 }
             });
 
@@ -634,6 +768,8 @@ namespace Cygnus
             {
                 MessageBox.Show(uri.ToString() + " is not a valid Cydia repository!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
+
+            return verified;
         }
 
         /// <summary>
@@ -647,7 +783,7 @@ namespace Cygnus
         /// Pkg will be used to find new packages using SearchPackagesByID()
         /// while Version is only used to check if newer Version exists.
         /// </remarks>
-        private static List<FastPackage> FastParsePkg(string path)
+        private static List<FastPackage> FastParsePackage(string path)
         {
             var ret = new List<FastPackage> { };
             var pack = new FastPackage();
@@ -668,18 +804,23 @@ namespace Cygnus
         }
 
         /// <summary>
-        /// THIS IS NOT USED YET!
-        /// This method compares two .Packages file and is not complete yet.
+        /// This method compares two .Packages file.
         /// </summary>
         /// <param name="oldFile">The old .Packages file.</param>
         /// <param name="newFile">The updated .Packages file.</param>
-        private static void Compare(string oldFile, string newFile)
+        private void CompareChanges(string oldFile, string newFile)
         {
-            // TODO: Create a reasonable UI to show changes...
-            var temp = FastParsePkg(newFile).Except(FastParsePkg(oldFile));
-            foreach (var item in temp)
+            var query = FastParsePackage(newFile).Except(FastParsePackage(oldFile));
+            foreach (FastPackage fastPack in query)
             {
-                ////MessageBox.Show(item.Pkg + "\n" + item.Version);
+                Package pack = SearchPackagesByID(fastPack.Pkg);
+                if (pack.Pkg != null)
+                {
+                    this.Invoke((MethodInvoker)delegate
+                    {
+                        UpdateChangesTable(pack);
+                    });
+                }
             }
         }
 
@@ -702,8 +843,7 @@ namespace Cygnus
         }
 
         /// <summary>
-        /// THIS IS NOT USED YET!
-        /// I call this FastPackage because it ignores many unnecessary 
+        /// I call this FastPackage because it ignores many unnecessary
         /// fields that is not used for comparison,  which results better performance.
         /// </summary>
         private struct FastPackage
@@ -713,6 +853,35 @@ namespace Cygnus
             public string Pkg, Version;
 
             #endregion Fields
+        }
+
+        private class DownloadQueue
+        {
+            #region Fields
+
+            public Uri DownloadUri;
+            public Row TableRow;
+
+            #endregion Fields
+
+            #region Methods
+
+            /*public override int GetHashCode()
+            {
+                return DownloadUri.GetHashCode() ^ TableRow.GetHashCode();
+            }
+
+            public override bool Equals(object obj)
+            {
+                if (obj == null) return false;
+                if (!(obj is DownloadQueue)) return false;
+
+                DownloadQueue other = (DownloadQueue)obj;
+
+                return other.DownloadUri == DownloadUri && other.TableRow == TableRow;
+            }*/
+
+            #endregion Methods
         }
 
         /// <summary>

@@ -61,23 +61,23 @@ namespace Cygnus
             ((System.ComponentModel.ISupportInitialize)(this.btnAdd)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox)).BeginInit();
             this.SuspendLayout();
-            // 
+            //
             // txtSource
-            // 
+            //
             this.txtSource.Location = new System.Drawing.Point(17, 45);
             this.txtSource.Name = "txtSource";
             this.txtSource.Size = new System.Drawing.Size(190, 20);
             this.txtSource.TabIndex = 1;
             this.txtSource.Text = "http://";
             this.txtSource.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtSource_KeyDown);
-            // 
+            //
             // errorProvider1
-            // 
+            //
             this.errorProvider1.ContainerControl = this;
             this.errorProvider1.Icon = ((System.Drawing.Icon)(resources.GetObject("errorProvider1.Icon")));
-            // 
+            //
             // btnEdit
-            // 
+            //
             this.btnEdit.Image = global::Cygnus.Properties.Resources.edit;
             this.btnEdit.Location = new System.Drawing.Point(-1, 80);
             this.btnEdit.Name = "btnEdit";
@@ -86,9 +86,9 @@ namespace Cygnus
             this.btnEdit.TabIndex = 4;
             this.btnEdit.TabStop = false;
             this.btnEdit.Click += new System.EventHandler(this.btnEdit_Click);
-            // 
+            //
             // btnCancel
-            // 
+            //
             this.btnCancel.Image = global::Cygnus.Properties.Resources.cancel;
             this.btnCancel.Location = new System.Drawing.Point(113, 80);
             this.btnCancel.Name = "btnCancel";
@@ -97,9 +97,9 @@ namespace Cygnus
             this.btnCancel.TabIndex = 3;
             this.btnCancel.TabStop = false;
             this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
-            // 
+            //
             // btnAdd
-            // 
+            //
             this.btnAdd.Image = global::Cygnus.Properties.Resources.addsource;
             this.btnAdd.Location = new System.Drawing.Point(-1, 80);
             this.btnAdd.Name = "btnAdd";
@@ -108,9 +108,9 @@ namespace Cygnus
             this.btnAdd.TabIndex = 2;
             this.btnAdd.TabStop = false;
             this.btnAdd.Click += new System.EventHandler(this.btnAdd_Click);
-            // 
+            //
             // pictureBox
-            // 
+            //
             this.pictureBox.Image = global::Cygnus.Properties.Resources.alert;
             this.pictureBox.Location = new System.Drawing.Point(0, 0);
             this.pictureBox.Name = "pictureBox";
@@ -118,9 +118,9 @@ namespace Cygnus
             this.pictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
             this.pictureBox.TabIndex = 0;
             this.pictureBox.TabStop = false;
-            // 
+            //
             // AlertView
-            // 
+            //
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(225, 116);
