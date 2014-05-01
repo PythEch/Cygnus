@@ -55,7 +55,7 @@ namespace Cygnus
         /// <summary>
         /// Used to store last selected package in Queue page.
         /// </summary>
-        private static DownloadQueue selectedQueue;
+        private static Queue selectedQueue;
 
         /// <summary>
         /// Used to zoom once after the first website is loaded to load user preferences.
@@ -208,8 +208,13 @@ namespace Cygnus
             this.listSources.Items.Clear();
             allRepos.Clear();
 
-            var sources = XDocument.Load("Cygnus.xml").Element("Settings").Elements("Source");
-            foreach (var source in sources)
+            var settings = XDocument.Load("Cygnus.xml").Element("Settings");
+
+            txtUDID.Text = settings.Element("UDID").Value;
+            boxiDevice.SelectedIndex = Convert.ToInt32(settings.Element("iDevice").Value);
+            boxVersion.SelectedIndex = Convert.ToInt32(settings.Element("Version").Value);
+
+            foreach (var source in settings.Elements("Source"))
             {
                 string repoUrl = source.Element("URL").Value.toValidURL();
                 string key = URLToFilename(repoUrl);
@@ -231,6 +236,10 @@ namespace Cygnus
         {
             XDocument doc = new XDocument(
                 new XElement("Settings",
+                    new XElement("UDID", txtUDID.Text),
+                    new XElement("iDevice", boxiDevice.SelectedIndex),
+                    new XElement("Version", boxVersion.SelectedIndex),
+
                     from ListViewItem item in this.listSources.Items
                     select new XElement("Source",
                         new XElement("URL", item.Text),
@@ -324,6 +333,9 @@ namespace Cygnus
         private void MainForm_Resize(object sender, EventArgs e)
         {
             ResizeColumns();
+
+            optionsPanel.Left = (this.ClientSize.Width - optionsPanel.Width) / 2;
+            optionsPanel.Top = (this.ClientSize.Height - optionsPanel.Height) / 2 - 35;
         }
 
         /// <summary>
@@ -332,6 +344,7 @@ namespace Cygnus
         private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
         {
             SaveUserSettings();
+            SaveXMLSettings();
         }
 
         /// <summary>
@@ -340,7 +353,7 @@ namespace Cygnus
         /// <param name="pack">Package to add.</param>
         private void UpdatePackagesTable(Package pack)
         {
-            Row row = new Row();
+            Row row = new Row() { Height = 18 };
             row.Cells.Add(new Cell()); // using empty cell for now, I'm going to replace this with Cydia-like Section Icons
             row.Cells.Add(new Cell(pack.Name, TitleStyle) { ForeColor = pack.Paid ? Color.Blue : Color.Black });
             this.tablePackages.TableModel.Rows.Add(row);
@@ -385,14 +398,14 @@ namespace Cygnus
         /// </summary>"
         /// <param name="packName">Package name to display.</param>
         /// <returns>The row index of the package.</returns>
-        private DownloadQueue UpdateQueueTable(string packName, Uri downloadUri)
+        private Queue UpdateQueueTable(string packName, Uri downloadUri)
         {
             Row row = new Row();
             row.Cells.Add(new Cell(packName, TitleStyle)); // Package name text
             row.Cells.Add(new Cell()); // Progressbar
             this.tableQueue.TableModel.Rows.Add(row);
 
-            DownloadQueue queue = new DownloadQueue() { DownloadUri = downloadUri, TableRow = row };
+            Queue queue = new Queue() { DownloadUri = downloadUri, TableRow = row };
             row.Tag = queue;
             return queue;
         }
@@ -501,7 +514,7 @@ namespace Cygnus
             if (allQueues.Any(x => x.DownloadUri == downloadUri)) return;
             // It's already in queue
 
-            DownloadQueue queue = UpdateQueueTable(selectedPackName, downloadUri);
+            Queue queue = UpdateQueueTable(selectedPackName, downloadUri);
             allQueues.Add(queue);
 
             // Wait until the queue is finished
@@ -525,7 +538,7 @@ namespace Cygnus
 
             await Task.Factory.StartNew(() =>
             {
-                DownloadFileAndReportProgress(downloadUri, filePath, selectedPackName, queue.TableRow.Cells[1]);
+                DownloadQueue(downloadUri, filePath, selectedPackName, queue.TableRow.Cells[1]);
 
                 if (downloadDependencies)
                 {
@@ -538,7 +551,7 @@ namespace Cygnus
             allQueues.Remove(queue);
         }
 
-        private async void btnDownload_Click(object sender, EventArgs e)
+        private void btnDownload_Click(object sender, EventArgs e)
         {
             DownloadPackage(false);
         }
@@ -609,19 +622,7 @@ namespace Cygnus
         {
             ResizeColumns();
 
-            switch (tabMain.SelectedIndex)
-            {
-                case 0: // Sources
-                case 2: // Queue
-                case 3: // Changes
-                    statusLabelZoom.Visible = false;
-                    trackBarZoom.Visible = false;
-                    break;
-                case 1: // Packages
-                    statusLabelZoom.Visible = true;
-                    trackBarZoom.Visible = true;
-                    break;
-            }
+            statusLabelZoom.Visible = trackBarZoom.Visible = (tabMain.SelectedIndex == 1);
         }
 
         /// <summary>
@@ -687,7 +688,7 @@ namespace Cygnus
             Row row;
             if (e.Button == System.Windows.Forms.MouseButtons.Right && (row = tableQueue.TableModel.RowAt(e.Y)) != null)
             {
-                selectedQueue = (DownloadQueue)row.Tag;
+                selectedQueue = (Queue)row.Tag;
                 contextMenuQueue.Show(Cursor.Position);
             }
         }

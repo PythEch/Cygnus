@@ -129,7 +129,7 @@ namespace Cygnus
         /// Used to download packages simultaneously.
         /// Stores the first Uri in the queue.
         /// </summary>
-        private static List<DownloadQueue> allQueues = new List<DownloadQueue> { };
+        private static List<Queue> allQueues = new List<Queue> { };
 
         private static bool isDownloadCanceled = false;
 
@@ -240,6 +240,16 @@ namespace Cygnus
             }
         }
 
+        private string GetUDID()
+        {
+            if (!this.txtUDID.Text.IsNullOrWhitespace() && this.txtUDID.Text.Length == 40)
+            {
+                return this.txtUDID.Text;
+            }
+            // else ...
+            return "0000000000000000000000000000000000000000";
+        }
+
         /// <summary>
         /// Downloads a file from web using an URL and a Stream.
         /// </summary>
@@ -253,8 +263,6 @@ namespace Cygnus
             ////request.Headers.Add("X-Firmware", "7.0.2");
             ////request.Headers.Add("X-Machine", "iPhone6,2");
             request.Headers.Add("X-Unique-ID", "0000000000000000000000000000000000000000");
-            //some repos require this for some reason
-            //TODO: use pseudo-random ID to prevent being banned from some repos in the future
 
             try
             {
@@ -294,12 +302,12 @@ namespace Cygnus
         /// </summary>
         /// <param name="uri">The URL to download.</param>
         /// <param name="path">The path where the file's going to be downloaded.</param>
-        private void DownloadFileAndReportProgress(Uri uri, string path, string packageName, Cell progressBarCell)
+        private void DownloadQueue(Uri uri, string path, string packageName, Cell progressBarCell)
         {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
             request.Method = WebRequestMethods.Http.Get;
             request.UserAgent = "Telesphoreo APT-HTTP/1.0.592";
-            request.Headers.Add("X-Unique-ID", "0000000000000000000000000000000000000000");
+            request.Headers.Add("X-Unique-ID", GetUDID());
 
             try
             {
@@ -691,7 +699,7 @@ namespace Cygnus
                 Uri uri = new Uri(new Uri(dependencyPack.Repo.URL), dependencyPack.Filename);
 
                 // Add to queue
-                ////DownloadQueue queue = UpdateQueueTable(pack.Name, uri);
+                ////Queue queue = UpdateQueueTable(pack.Name, uri);
                 ////allQueues.Add(queue);
 
                 string downloadPath = Path.Combine(dirPath, Path.GetFileName(uri.LocalPath));
@@ -700,7 +708,7 @@ namespace Cygnus
 
                 DownloadFile(uri, downloadPath);
 
-                ////DownloadFileAndReportProgress(uri, downloadPath, pack.Name, queue.TableRow.Cells[1]);
+                ////DownloadQueue(uri, downloadPath, pack.Name, queue.TableRow.Cells[1]);
 
                 DownloadAllDependencies(dependencyPack, dirPath); //yay! recursion
             }
@@ -855,7 +863,7 @@ namespace Cygnus
             #endregion Fields
         }
 
-        private class DownloadQueue
+        private class Queue
         {
             #region Fields
 
@@ -874,9 +882,9 @@ namespace Cygnus
             public override bool Equals(object obj)
             {
                 if (obj == null) return false;
-                if (!(obj is DownloadQueue)) return false;
+                if (!(obj is Queue)) return false;
 
-                DownloadQueue other = (DownloadQueue)obj;
+                Queue other = (Queue)obj;
 
                 return other.DownloadUri == DownloadUri && other.TableRow == TableRow;
             }*/
