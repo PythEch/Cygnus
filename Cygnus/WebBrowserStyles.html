@@ -1,0 +1,67 @@
+<html>
+<head>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge' />
+    <style type='text/css'>
+        html,
+        body,
+        #depiction {
+            height: 100%;
+        }
+        body {
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+        }
+        .btn {
+            position: relative;
+            top: 0;
+            width: 45%;
+            padding: 3% 0;
+            margin: 5px;
+            border: 0;
+            border-radius: 6px;
+            box-shadow: #007269 0 5px 0;
+            background-color: #00a683;
+            font-size: 1.2rem;
+            font-weight: 450;
+            color: white;
+            cursor: pointer;
+            transition-property: background-color, box-shadow, top;
+            transition-duration: 300ms, 150ms, 150ms;
+        }
+        .btn:hover {
+            background-color: #007e6a;
+            box-shadow: #004047 0 5px 0;
+        }
+        .btn:active {
+            top: 2px;
+            box-shadow: #004047 0 3px 0;
+        }
+        #header {
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 0 0 5px;
+            margin: 0;
+            background-color: #08C29A;
+        }
+        #depiction {
+            padding-bottom: 70px;
+            width: 100%;
+            border: none;
+            box-sizing: border-box;
+        }
+        #downloadfully {
+            float: right;
+        }
+    </style>
+</head>
+<body>
+    <div id='header'>
+        <input type='button' class='btn' value='&lt; Back' id='back' style='display: none;' />
+        <input type='button' class='btn' value='Download' id='download' />
+        <input type='button' class='btn' value='Download Fully' id='downloadfully' />
+    </div>
+    <iframe id='depiction'>Your browser is too damn old...</iframe>
+</body>
+</html>

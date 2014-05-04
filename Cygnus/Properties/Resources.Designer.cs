@@ -10,8 +10,8 @@
 
 namespace Cygnus.Properties {
     using System;
-
-
+    
+    
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -23,15 +23,15 @@ namespace Cygnus.Properties {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
-
+        
         private static global::System.Resources.ResourceManager resourceMan;
-
+        
         private static global::System.Globalization.CultureInfo resourceCulture;
-
+        
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
         internal Resources() {
         }
-
+        
         /// <summary>
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
@@ -45,7 +45,7 @@ namespace Cygnus.Properties {
                 return resourceMan;
             }
         }
-
+        
         /// <summary>
         ///   Overrides the current thread's CurrentUICulture property for all
         ///   resource lookups using this strongly typed resource class.
@@ -59,7 +59,7 @@ namespace Cygnus.Properties {
                 resourceCulture = value;
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
@@ -69,7 +69,7 @@ namespace Cygnus.Properties {
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
@@ -79,7 +79,7 @@ namespace Cygnus.Properties {
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
@@ -89,7 +89,7 @@ namespace Cygnus.Properties {
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
@@ -99,7 +99,7 @@ namespace Cygnus.Properties {
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
@@ -107,6 +107,35 @@ namespace Cygnus.Properties {
             get {
                 object obj = ResourceManager.GetObject("spinner", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;html&gt;
+        ///&lt;head&gt;
+        ///    &lt;meta http-equiv=&apos;X-UA-Compatible&apos; content=&apos;IE=edge&apos; /&gt;
+        ///    &lt;style&gt;
+        ///        #topnav {
+        ///            width: 100%;
+        ///            background-color: #08C29A;
+        ///            overflow: hidden;
+        ///            position: absolute;
+        ///            top: 0;
+        ///            left: 0;
+        ///            padding: 0 0 5px;
+        ///            margin: 0;
+        ///        }
+        ///        .btn {
+        ///            position: relative;
+        ///            top: 0;
+        ///            width: 45%;
+        ///            padding: 10px 0;
+        ///            margin: 5px;
+        ///            b [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string WebBrowserStyles {
+            get {
+                return ResourceManager.GetString("WebBrowserStyles", resourceCulture);
             }
         }
     }

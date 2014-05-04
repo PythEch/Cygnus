@@ -112,6 +112,9 @@
     <EmbeddedResource Include="AlertView.resx">
       <DependentUpon>AlertView.cs</DependentUpon>
     </EmbeddedResource>
+    <None Include="WebBrowserStyles.html">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

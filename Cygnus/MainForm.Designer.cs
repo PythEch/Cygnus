@@ -67,8 +67,6 @@ namespace Cygnus
             this.pagePackages = new System.Windows.Forms.TabPage();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.tablePackages = new XPTable.Models.Table();
-            this.btnDownloadFully = new System.Windows.Forms.Button();
-            this.btnDownload = new System.Windows.Forms.Button();
             this.webBrowser1 = new System.Windows.Forms.WebBrowser();
             this.btnSearch = new System.Windows.Forms.Button();
             this.txtSearch = new System.Windows.Forms.TextBox();
@@ -76,6 +74,17 @@ namespace Cygnus
             this.tableQueue = new XPTable.Models.Table();
             this.pageChanges = new System.Windows.Forms.TabPage();
             this.tableChanges = new XPTable.Models.Table();
+            this.pageOptions = new System.Windows.Forms.TabPage();
+            this.label5 = new System.Windows.Forms.Label();
+            this.optionsPanel = new System.Windows.Forms.Panel();
+            this.txtUDID = new System.Windows.Forms.MaskedTextBox();
+            this.boxiDevice = new System.Windows.Forms.ComboBox();
+            this.label6 = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
+            this.boxVersion = new System.Windows.Forms.ComboBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
             this.trackBarZoom = new System.Windows.Forms.TrackBar();
             this.statusStrip = new System.Windows.Forms.StatusStrip();
             this.statusBarProgressbar = new System.Windows.Forms.ToolStripProgressBar();
@@ -86,17 +95,6 @@ namespace Cygnus
             this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
-            this.pageOptions = new System.Windows.Forms.TabPage();
-            this.optionsPanel = new System.Windows.Forms.Panel();
-            this.txtUDID = new System.Windows.Forms.MaskedTextBox();
-            this.boxiDevice = new System.Windows.Forms.ComboBox();
-            this.label6 = new System.Windows.Forms.Label();
-            this.label1 = new System.Windows.Forms.Label();
-            this.boxVersion = new System.Windows.Forms.ComboBox();
-            this.label2 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.label5 = new System.Windows.Forms.Label();
             this.tabMain.SuspendLayout();
             this.pageSource.SuspendLayout();
             this.pagePackages.SuspendLayout();
@@ -109,11 +107,11 @@ namespace Cygnus
             ((System.ComponentModel.ISupportInitialize)(this.tableQueue)).BeginInit();
             this.pageChanges.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.tableChanges)).BeginInit();
+            this.pageOptions.SuspendLayout();
+            this.optionsPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarZoom)).BeginInit();
             this.statusStrip.SuspendLayout();
             this.contextMenuQueue.SuspendLayout();
-            this.pageOptions.SuspendLayout();
-            this.optionsPanel.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabMain
@@ -248,8 +246,6 @@ namespace Cygnus
             // 
             // splitContainer1.Panel2
             // 
-            this.splitContainer1.Panel2.Controls.Add(this.btnDownloadFully);
-            this.splitContainer1.Panel2.Controls.Add(this.btnDownload);
             this.splitContainer1.Panel2.Controls.Add(this.webBrowser1);
             this.splitContainer1.Size = new System.Drawing.Size(473, 255);
             this.splitContainer1.SplitterDistance = 227;
@@ -277,30 +273,6 @@ namespace Cygnus
             this.tablePackages.UnfocusedBorderColor = System.Drawing.Color.Black;
             this.tablePackages.SelectionChanged += new XPTable.Events.SelectionEventHandler(this.listPackages_SelectionChanged);
             // 
-            // btnDownloadFully
-            // 
-            this.btnDownloadFully.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnDownloadFully.Enabled = false;
-            this.btnDownloadFully.Location = new System.Drawing.Point(114, 227);
-            this.btnDownloadFully.Name = "btnDownloadFully";
-            this.btnDownloadFully.Size = new System.Drawing.Size(105, 25);
-            this.btnDownloadFully.TabIndex = 6;
-            this.btnDownloadFully.Text = "Download Fully";
-            this.btnDownloadFully.UseVisualStyleBackColor = true;
-            this.btnDownloadFully.Click += new System.EventHandler(this.btnDownloadFully_Click);
-            // 
-            // btnDownload
-            // 
-            this.btnDownload.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnDownload.Enabled = false;
-            this.btnDownload.Location = new System.Drawing.Point(3, 227);
-            this.btnDownload.Name = "btnDownload";
-            this.btnDownload.Size = new System.Drawing.Size(105, 25);
-            this.btnDownload.TabIndex = 5;
-            this.btnDownload.Text = "Download";
-            this.btnDownload.UseVisualStyleBackColor = true;
-            this.btnDownload.Click += new System.EventHandler(this.btnDownload_Click);
-            // 
             // webBrowser1
             // 
             this.webBrowser1.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -308,10 +280,9 @@ namespace Cygnus
             this.webBrowser1.MinimumSize = new System.Drawing.Size(20, 20);
             this.webBrowser1.Name = "webBrowser1";
             this.webBrowser1.ScriptErrorsSuppressed = true;
+            this.webBrowser1.ScrollBarsEnabled = false;
             this.webBrowser1.Size = new System.Drawing.Size(242, 255);
             this.webBrowser1.TabIndex = 0;
-            this.webBrowser1.Url = new System.Uri("about:blank", System.UriKind.Absolute);
-            this.webBrowser1.DocumentCompleted += new System.Windows.Forms.WebBrowserDocumentCompletedEventHandler(this.webBrowser1_DocumentCompleted);
             this.webBrowser1.NewWindow += new System.ComponentModel.CancelEventHandler(this.webBrowser1_NewWindow);
             // 
             // btnSearch
@@ -405,88 +376,6 @@ namespace Cygnus
             this.tableChanges.TabIndex = 1;
             this.tableChanges.UnfocusedBorderColor = System.Drawing.Color.Black;
             // 
-            // trackBarZoom
-            // 
-            this.trackBarZoom.AutoSize = false;
-            this.trackBarZoom.LargeChange = 2;
-            this.trackBarZoom.Location = new System.Drawing.Point(399, 2);
-            this.trackBarZoom.Maximum = 12;
-            this.trackBarZoom.Minimum = 1;
-            this.trackBarZoom.Name = "trackBarZoom";
-            this.trackBarZoom.Size = new System.Drawing.Size(87, 25);
-            this.trackBarZoom.TabIndex = 6;
-            this.trackBarZoom.Value = 10;
-            this.trackBarZoom.Scroll += new System.EventHandler(this.trackBarZoom_Scroll);
-            // 
-            // statusStrip
-            // 
-            this.statusStrip.AutoSize = false;
-            this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.statusBarProgressbar,
-            this.statusLabelDownload,
-            this.toolStripStatusLabel1,
-            this.statusLabelZoom});
-            this.statusStrip.Location = new System.Drawing.Point(0, 322);
-            this.statusStrip.Name = "statusStrip";
-            this.statusStrip.Size = new System.Drawing.Size(500, 26);
-            this.statusStrip.TabIndex = 1;
-            // 
-            // statusBarProgressbar
-            // 
-            this.statusBarProgressbar.Name = "statusBarProgressbar";
-            this.statusBarProgressbar.Size = new System.Drawing.Size(100, 20);
-            this.statusBarProgressbar.Visible = false;
-            // 
-            // statusLabelDownload
-            // 
-            this.statusLabelDownload.Name = "statusLabelDownload";
-            this.statusLabelDownload.Size = new System.Drawing.Size(111, 21);
-            this.statusLabelDownload.Text = "{0}% Complete ({1})";
-            this.statusLabelDownload.Visible = false;
-            // 
-            // toolStripStatusLabel1
-            // 
-            this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
-            this.toolStripStatusLabel1.Size = new System.Drawing.Size(416, 21);
-            this.toolStripStatusLabel1.Spring = true;
-            // 
-            // statusLabelZoom
-            // 
-            this.statusLabelZoom.Name = "statusLabelZoom";
-            this.statusLabelZoom.Size = new System.Drawing.Size(69, 21);
-            this.statusLabelZoom.Text = "Zoom: {0}%";
-            // 
-            // contextMenuQueue
-            // 
-            this.contextMenuQueue.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.deleteToolStripMenuItem,
-            this.openFolderToolStripMenuItem});
-            this.contextMenuQueue.Name = "contextMenuQueue";
-            this.contextMenuQueue.Size = new System.Drawing.Size(198, 48);
-            // 
-            // deleteToolStripMenuItem
-            // 
-            this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
-            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(197, 22);
-            this.deleteToolStripMenuItem.Text = "Delete";
-            this.deleteToolStripMenuItem.Click += new System.EventHandler(this.deleteToolStripMenuItem_Click);
-            // 
-            // openFolderToolStripMenuItem
-            // 
-            this.openFolderToolStripMenuItem.Name = "openFolderToolStripMenuItem";
-            this.openFolderToolStripMenuItem.Size = new System.Drawing.Size(197, 22);
-            this.openFolderToolStripMenuItem.Text = "Open containing folder";
-            this.openFolderToolStripMenuItem.Click += new System.EventHandler(this.openFolderToolStripMenuItem_Click);
-            // 
-            // toolStripDropDownButton1
-            // 
-            this.toolStripDropDownButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolStripDropDownButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButton1.Image")));
-            this.toolStripDropDownButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripDropDownButton1.Name = "toolStripDropDownButton1";
-            this.toolStripDropDownButton1.Size = new System.Drawing.Size(29, 20);
-            this.toolStripDropDownButton1.Text = "toolStripDropDownButton1";
-            // 
             // pageOptions
             // 
             this.pageOptions.Controls.Add(this.label5);
@@ -498,6 +387,19 @@ namespace Cygnus
             this.pageOptions.TabIndex = 4;
             this.pageOptions.Text = "Options";
             this.pageOptions.UseVisualStyleBackColor = true;
+            // 
+            // label5
+            // 
+            this.label5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.label5.AutoSize = true;
+            this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.label5.Location = new System.Drawing.Point(383, 288);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(109, 12);
+            this.label5.TabIndex = 12;
+            this.label5.Text = "Cygnus 0.5.2 by PythEch";
+            this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.label5.Click += new System.EventHandler(this.label5_Click);
             // 
             // optionsPanel
             // 
@@ -588,17 +490,87 @@ namespace Cygnus
             this.label3.TabIndex = 4;
             this.label3.Text = "iDevice:";
             // 
-            // label5
+            // trackBarZoom
             // 
-            this.label5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.label5.AutoSize = true;
-            this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.label5.Location = new System.Drawing.Point(323, 276);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(169, 24);
-            this.label5.TabIndex = 12;
-            this.label5.Text = "Your options stay local on this computer.\r\nCygnus cares about your privacy.";
-            this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.trackBarZoom.AutoSize = false;
+            this.trackBarZoom.LargeChange = 2;
+            this.trackBarZoom.Location = new System.Drawing.Point(399, 2);
+            this.trackBarZoom.Maximum = 12;
+            this.trackBarZoom.Minimum = 1;
+            this.trackBarZoom.Name = "trackBarZoom";
+            this.trackBarZoom.Size = new System.Drawing.Size(87, 25);
+            this.trackBarZoom.TabIndex = 6;
+            this.trackBarZoom.Value = 10;
+            this.trackBarZoom.Scroll += new System.EventHandler(this.trackBarZoom_Scroll);
+            // 
+            // statusStrip
+            // 
+            this.statusStrip.AutoSize = false;
+            this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.statusBarProgressbar,
+            this.statusLabelDownload,
+            this.toolStripStatusLabel1,
+            this.statusLabelZoom});
+            this.statusStrip.Location = new System.Drawing.Point(0, 322);
+            this.statusStrip.Name = "statusStrip";
+            this.statusStrip.Size = new System.Drawing.Size(500, 26);
+            this.statusStrip.TabIndex = 1;
+            // 
+            // statusBarProgressbar
+            // 
+            this.statusBarProgressbar.Name = "statusBarProgressbar";
+            this.statusBarProgressbar.Size = new System.Drawing.Size(100, 20);
+            this.statusBarProgressbar.Visible = false;
+            // 
+            // statusLabelDownload
+            // 
+            this.statusLabelDownload.Name = "statusLabelDownload";
+            this.statusLabelDownload.Size = new System.Drawing.Size(111, 21);
+            this.statusLabelDownload.Text = "{0}% Complete ({1})";
+            this.statusLabelDownload.Visible = false;
+            // 
+            // toolStripStatusLabel1
+            // 
+            this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
+            this.toolStripStatusLabel1.Size = new System.Drawing.Size(416, 21);
+            this.toolStripStatusLabel1.Spring = true;
+            // 
+            // statusLabelZoom
+            // 
+            this.statusLabelZoom.Name = "statusLabelZoom";
+            this.statusLabelZoom.Size = new System.Drawing.Size(69, 21);
+            this.statusLabelZoom.Text = "Zoom: {0}%";
+            // 
+            // contextMenuQueue
+            // 
+            this.contextMenuQueue.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.deleteToolStripMenuItem,
+            this.openFolderToolStripMenuItem});
+            this.contextMenuQueue.Name = "contextMenuQueue";
+            this.contextMenuQueue.Size = new System.Drawing.Size(198, 48);
+            // 
+            // deleteToolStripMenuItem
+            // 
+            this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
+            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(197, 22);
+            this.deleteToolStripMenuItem.Text = "Delete";
+            this.deleteToolStripMenuItem.Click += new System.EventHandler(this.deleteToolStripMenuItem_Click);
+            // 
+            // openFolderToolStripMenuItem
+            // 
+            this.openFolderToolStripMenuItem.Name = "openFolderToolStripMenuItem";
+            this.openFolderToolStripMenuItem.Size = new System.Drawing.Size(197, 22);
+            this.openFolderToolStripMenuItem.Text = "Open containing folder";
+            this.openFolderToolStripMenuItem.Click += new System.EventHandler(this.openFolderToolStripMenuItem_Click);
+            // 
+            // toolStripDropDownButton1
+            // 
+            this.toolStripDropDownButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.toolStripDropDownButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButton1.Image")));
+            this.toolStripDropDownButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripDropDownButton1.Name = "toolStripDropDownButton1";
+            this.toolStripDropDownButton1.Size = new System.Drawing.Size(29, 20);
+            this.toolStripDropDownButton1.Text = "toolStripDropDownButton1";
             // 
             // MainForm
             // 
@@ -627,14 +599,14 @@ namespace Cygnus
             ((System.ComponentModel.ISupportInitialize)(this.tableQueue)).EndInit();
             this.pageChanges.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.tableChanges)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.trackBarZoom)).EndInit();
-            this.statusStrip.ResumeLayout(false);
-            this.statusStrip.PerformLayout();
-            this.contextMenuQueue.ResumeLayout(false);
             this.pageOptions.ResumeLayout(false);
             this.pageOptions.PerformLayout();
             this.optionsPanel.ResumeLayout(false);
             this.optionsPanel.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBarZoom)).EndInit();
+            this.statusStrip.ResumeLayout(false);
+            this.statusStrip.PerformLayout();
+            this.contextMenuQueue.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -657,7 +629,6 @@ namespace Cygnus
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.Button btnSearch;
         private System.Windows.Forms.TextBox txtSearch;
-        private System.Windows.Forms.Button btnDownload;
         private System.Windows.Forms.TrackBar trackBarZoom;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
         private System.Windows.Forms.ToolStripStatusLabel statusLabelZoom;
@@ -671,7 +642,6 @@ namespace Cygnus
         private System.Windows.Forms.ToolStripMenuItem deleteToolStripMenuItem;
         private System.Windows.Forms.ToolStripDropDownButton toolStripDropDownButton1;
         private System.Windows.Forms.ToolStripMenuItem openFolderToolStripMenuItem;
-        private System.Windows.Forms.Button btnDownloadFully;
         private System.Windows.Forms.TabPage pageOptions;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Panel optionsPanel;

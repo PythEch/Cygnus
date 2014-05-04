@@ -57,10 +57,7 @@ namespace Cygnus
         /// </summary>
         private static Queue selectedQueue;
 
-        /// <summary>
-        /// Used to zoom once after the first website is loaded to load user preferences.
-        /// </summary>
-        private static bool zoomedBefore = false;
+        private static HtmlElement cssBtnDownload, cssBtnDownloadFully, cssBtnBack, cssFrameDepiction;
 
         #endregion Fields
 
@@ -324,7 +321,27 @@ namespace Cygnus
             this.statusStrip.Items.Add(new ToolStripControlHost(this.trackBarZoom));
             //Adds zoom trackbar which isn't possible to do with the Designer
 
-            this.tabMain_SelectedIndexChanged(null, null);
+            this.webBrowser1.Navigate("about:blank");
+            this.webBrowser1.Document.Write(String.Empty); // Stupid workaround, thanks: http://stackoverflow.com/a/21608474
+            this.webBrowser1.DocumentText = Properties.Resources.WebBrowserStyles;
+
+            while (this.webBrowser1.ReadyState != WebBrowserReadyState.Complete)
+                Application.DoEvents();
+
+            cssBtnDownload = this.webBrowser1.Document.GetElementById("download");
+            cssBtnDownloadFully = this.webBrowser1.Document.GetElementById("downloadfully");
+            cssBtnBack = this.webBrowser1.Document.GetElementById("back");
+            cssFrameDepiction = this.webBrowser1.Document.GetElementById("depiction");
+
+            cssBtnDownload.Enabled = cssBtnDownloadFully.Enabled = false;
+
+            cssBtnDownload.Click += delegate { DownloadPackage(false); };
+            cssBtnDownloadFully.Click += delegate { DownloadPackage(true); };
+            cssBtnBack.Click += delegate { NavigateWebBrowser(selectedPack.Depiction); };
+
+            ZoomWebBrowser();
+
+            tabMain_SelectedIndexChanged(null, null);
         }
 
         /// <summary>
@@ -477,7 +494,7 @@ namespace Cygnus
         /// </summary>
         private void btnSearch_Click(object sender, EventArgs e)
         {
-            this.btnDownload.Enabled = this.btnDownloadFully.Enabled = true;
+            cssBtnDownload.Enabled = cssBtnDownloadFully.Enabled = true;
             this.tablePackages.BeginUpdate();
             this.tablePackages.ClearAllData();
 
@@ -487,7 +504,7 @@ namespace Cygnus
             {
                 this.tablePackages.NoItemsText = "No packages found...";
                 this.tablePackages.EndUpdate();
-                this.btnDownload.Enabled = this.btnDownloadFully.Enabled = false;
+                cssBtnDownload.Enabled = cssBtnDownloadFully.Enabled = false;
                 return;
             }
 
@@ -567,25 +584,9 @@ namespace Cygnus
         /// <param name="url">The URL to navigate.</param>
         private void NavigateWebBrowser(string url)
         {
-            // SUPER HACKY WORKAROUND TO SOLVE STUPID WebBrowser PROBLEM
-            webBrowser1.DocumentText = @"<html>
-<head><meta http-equiv='X-UA-Compatible' content='IE=edge'></head>
-<body>
-<iframe src='" + url.toValidURL() + @"' style='border:0; position:absolute; top:0; left:0; right:0; bottom:0; width:100%; height:100%' />
-</body>
-</html>";
-            // Problem:
-            // ieframe.dll based WebBrowser control loads webpages using IE7 compatibility mode by default
-            //
-            // I've found this workaround by myself. This solves three problems:
-            // • We won't need to have Administrator privileges and do a stupid registry trick:
-            // http://msdn.microsoft.com/en-us/library/ie/ee330730%28v=vs.85%29.aspx
-            //
-            // • And other than that, for some reason, this WebBrowser control doesn't render
-            // Modmyi properly even after that trick.
-            //
-            // • And finally, we won't need to detect IE Version to set registry value correctly.
-            // It'll use the latest Version avaiable on the computer automatically
+            cssFrameDepiction.SetAttribute("src", url.toValidURL());
+
+            ShowDownloadButtons();
         }
 
         /// <summary>
@@ -594,7 +595,7 @@ namespace Cygnus
         /// </para><para>
         /// Basically, first this function navigates to the depiction of
         /// selected package. Then it changes selectedPack variable to make
-        /// btnDownload can determine which package was selected.
+        /// cssBtnDownload can determine which package was selected.
         /// </para>
         /// </summary>
         private void listPackages_SelectionChanged(object sender, XPTable.Events.SelectionEventArgs e)
@@ -649,22 +650,6 @@ namespace Cygnus
         }
 
         /// <summary>
-        /// The default zoom factor is 100% hence we need to zoom
-        /// once if the user preference is different than 100%.
-        /// I tried some other ways to do the exact same thing but
-        /// this was the most reliable way. This event gets called
-        /// after every website is fully loaded.
-        /// </summary>
-        private void webBrowser1_DocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
-        {
-            if (!zoomedBefore)
-            {
-                ZoomWebBrowser();
-                zoomedBefore = true;
-            }
-        }
-
-        /// <summary>
         /// This prevents WebBrowser from opening (real) Internet Explorer and then
         /// navigates to the clicked link.
         /// </summary>
@@ -672,6 +657,19 @@ namespace Cygnus
         {
             e.Cancel = true;
             NavigateWebBrowser(this.webBrowser1.StatusText);
+            HideDownloadButtons();
+        }
+
+        private void ShowDownloadButtons()
+        {
+            cssBtnDownload.Style = cssBtnDownloadFully.Style = String.Empty;
+            cssBtnBack.Style = "display: none;";
+        }
+
+        private void HideDownloadButtons()
+        {
+            cssBtnDownload.Style = cssBtnDownloadFully.Style = "display: none;";
+            cssBtnBack.Style = String.Empty;
         }
 
         /// <summary>
@@ -735,6 +733,13 @@ namespace Cygnus
             }
         }
 
+        private void label5_Click(object sender, EventArgs e)
+        {
+            System.Diagnostics.Process.Start("https://github.com/PythEch/Cygnus");
+        }
+
         #endregion Methods
+
+        
     }
 }
