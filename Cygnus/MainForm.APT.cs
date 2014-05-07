@@ -242,13 +242,14 @@ namespace Cygnus
 
         private string GetUDID()
         {
-            if (!this.txtUDID.Text.IsNullOrWhitespace() && this.txtUDID.Text.Length == 40)
+            if (!this.txtUDID.Text.Contains(' ') && this.txtUDID.Text.Length == 40)
             {
                 return this.txtUDID.Text;
             }
             // else ...
-            //return "0000000000000000000000000000000000000000";
-              return "10ADED B4D455 C1A551C4L 1CE C01D DEB5"; // DEC1A551F1ED
+            return "10aded70015040b4d455c1a551c411cec01ddeb5";
+            //Loaded tools for badass classical ice cold debs
+            //This is a bit forced though
         }
 
         /// <summary>
@@ -263,7 +264,7 @@ namespace Cygnus
             request.UserAgent = "Telesphoreo APT-HTTP/1.0.592";
             ////request.Headers.Add("X-Firmware", "7.0.2");
             ////request.Headers.Add("X-Machine", "iPhone6,2");
-            request.Headers.Add("X-Unique-ID", "0000000000000000000000000000000000000000");
+            request.Headers.Add("X-Unique-ID", "10aded70015040b4d455c1a551c411cec01ddeb5");
 
             try
             {
@@ -543,7 +544,8 @@ namespace Cygnus
                                 pack.Filename = value;
                                 break;
                             case "Section":
-                                pack.Section = value;
+                                pack.Section = value.Replace('_', ' ');
+                                // Weird section name choices... Sometimes the space is replaced with underscore instead
                                 break;
                             case "Pre-Depends":
                             case "Depends":
