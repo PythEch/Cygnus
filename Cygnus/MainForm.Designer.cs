@@ -250,6 +250,7 @@ namespace Cygnus
             this.splitContainer1.Size = new System.Drawing.Size(473, 255);
             this.splitContainer1.SplitterDistance = 227;
             this.splitContainer1.TabIndex = 4;
+            this.splitContainer1.SplitterMoved += new System.Windows.Forms.SplitterEventHandler(this.splitContainer1_SplitterMoved);
             // 
             // tablePackages
             // 

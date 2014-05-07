@@ -192,7 +192,7 @@ namespace Cygnus
             //Extract archive to repos\temp directory first.
             //Because sometimes it is necessary to rename extracted files.
 
-            ProcessStartInfo startInfo = new ProcessStartInfo("repos\\7za.exe", "x -orepos\\temp -y repos\\" + zipName);
+            ProcessStartInfo startInfo = new ProcessStartInfo("repos\\7za.exe", "x -orepos\\tmp -y repos\\" + zipName);
             startInfo.RedirectStandardOutput = true;
             startInfo.UseShellExecute = false;
             startInfo.CreateNoWindow = true;
@@ -201,7 +201,7 @@ namespace Cygnus
 
             //Rename/Move the extracted file.
 
-            string sourceFilePath = Directory.GetFiles("repos\\temp")[0];
+            string sourceFilePath = Directory.GetFiles("repos\\tmp")[0];
             string targetFilePath = "repos\\" + Path.GetFileNameWithoutExtension(zipName);
 
             if (File.Exists(targetFilePath))
@@ -212,7 +212,7 @@ namespace Cygnus
 
             File.Move(sourceFilePath, targetFilePath);
 
-            Directory.Delete("repos\\temp", true); //Clean up the mess
+            Directory.Delete("repos\\tmp", true); //Clean up the mess
         }
 
         /// <summary>
@@ -247,7 +247,8 @@ namespace Cygnus
                 return this.txtUDID.Text;
             }
             // else ...
-            return "0000000000000000000000000000000000000000";
+            //return "0000000000000000000000000000000000000000";
+              return "10ADED B4D455 C1A551C4L 1CE C01D DEB5"; // DEC1A551F1ED
         }
 
         /// <summary>

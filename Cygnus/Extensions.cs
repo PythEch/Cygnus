@@ -1,6 +1,25 @@
-﻿namespace Cygnus.Extensions
+﻿// <copyright file="Extensions.cs">
+//    Copyright (C) 2014  PythEch
+//
+//    This program is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either Version 3 of the License, or
+//    (at your option) any later Version.
+//
+//    This program is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// </copyright>
+// <summary>Cygnus - Cydia-like APT Client for Windows</summary>
+
+namespace Cygnus.Extensions
 {
     using System;
+    using System.Collections.Generic;
     using XPTable.Models;
 
     /// <summary>
@@ -43,6 +62,23 @@
         public static bool IsNullOrWhitespace(this String str)
         {
             return String.IsNullOrWhiteSpace(str);
+        }
+
+        /// <summary>
+        /// int.TryParse() shortcut.
+        /// </summary>
+        /// <param name="str">The string to cast.</param>
+        /// <param name="defaultValue">Default value to return in case conversion fails.</param>
+        /// <returns>Int32 equivalent of the string. defaultValue if something goes wrong.</returns>
+        public static int ToInt32(this String str, int defaultValue=0)
+        {
+            int result;
+            if (Int32.TryParse(str, out result))
+            {
+                return result;
+            }
+            // else
+            return defaultValue;
         }
 
         /// <summary>

@@ -25,6 +25,7 @@ namespace Cygnus
     using System.Threading.Tasks;
     using System.Windows.Forms;
     using System.Xml.Linq;
+    using System.Collections.Generic;
 
     using Cygnus.Extensions;
     using XPTable.Models;
@@ -59,6 +60,49 @@ namespace Cygnus
 
         private static HtmlElement cssBtnDownload, cssBtnDownloadFully, cssBtnBack, cssFrameDepiction;
 
+        private static readonly Dictionary<string, Bitmap> SectionIcons = new Dictionary<string, Bitmap>
+        {
+            {"Addons", Properties.Resources.Addons},
+            {"Administration", Properties.Resources.Administration},
+            {"Archiving", Properties.Resources.Archiving},
+            {"Books", Properties.Resources.Books},
+            {"Carrier_Bundles", Properties.Resources.Carrier_Bundles},
+            {"Data_Storage", Properties.Resources.Data_Storage},
+            {"Development", Properties.Resources.Development},
+            {"Dictionaries", Properties.Resources.Dictionaries},
+            {"Education", Properties.Resources.Education},
+            {"Entertainment", Properties.Resources.Entertainment},
+            {"Fonts", Properties.Resources.Fonts},
+            {"Games", Properties.Resources.Games},
+            {"Health_and_Fitness", Properties.Resources.Health_and_Fitness},
+            {"Java", Properties.Resources.Java},
+            {"Keyboards", Properties.Resources.Keyboards},
+            {"Localization", Properties.Resources.Localization},
+            {"Messaging", Properties.Resources.Messaging},
+            {"Multimedia", Properties.Resources.Multimedia},
+            {"Navigation", Properties.Resources.Navigation},
+            {"Networking", Properties.Resources.Networking},
+            {"Packaging", Properties.Resources.Packaging},
+            {"Productivity", Properties.Resources.Productivity},
+            {"Repositories", Properties.Resources.Repositories},
+            {"Ringtones", Properties.Resources.Ringtones},
+            {"Scripting", Properties.Resources.Scripting},
+            {"Security", Properties.Resources.Security},
+            {"Site-Specific_Apps", Properties.Resources.Site_Specific_Apps},
+            {"Social", Properties.Resources.Social},
+            {"Soundboards", Properties.Resources.Soundboards},
+            {"System", Properties.Resources.System},
+            {"Terminal_Support", Properties.Resources.Terminal_Support},
+            {"Text_Editors", Properties.Resources.Text_Editors},
+            {"Themes", Properties.Resources.Themes},
+            {"Toys", Properties.Resources.Toys},
+            {"Tweaks", Properties.Resources.Tweaks},
+            {"Utilities", Properties.Resources.Utilities},
+            {"Wallpaper", Properties.Resources.Wallpaper},
+            {"Widgets", Properties.Resources.Widgets},
+            {"X_Window", Properties.Resources.X_Window},
+        };
+
         #endregion Fields
 
         #region Constructors
@@ -86,7 +130,7 @@ namespace Cygnus
             this.tablePackages.GridLines = GridLines.None;
             this.tablePackages.EnableWordWrap = true;
 
-            ImageColumn col1 = new ImageColumn(String.Empty, 20) { Editable = false, Resizable = false };
+            ImageColumn col1 = new ImageColumn(String.Empty, 32) { Editable = false, Resizable = false };
             TextColumn col2 = new TextColumn() { Editable = false, Resizable = false };
 
             this.tablePackages.ColumnModel = new ColumnModel(new Column[] { col1, col2 });
@@ -97,7 +141,7 @@ namespace Cygnus
             this.tableChanges.GridLines = GridLines.None;
             this.tableChanges.EnableWordWrap = true;
 
-            ImageColumn col3 = new ImageColumn(String.Empty, 20) { Editable = false, Resizable = false };
+            ImageColumn col3 = new ImageColumn(String.Empty, 32) { Editable = false, Resizable = false };
             TextColumn col4 = new TextColumn() { Editable = false, Resizable = false };
 
             this.tableChanges.ColumnModel = new ColumnModel(new Column[] { col3, col4 });
@@ -208,8 +252,8 @@ namespace Cygnus
             var settings = XDocument.Load("Cygnus.xml").Element("Settings");
 
             txtUDID.Text = settings.Element("UDID").Value;
-            boxiDevice.SelectedIndex = Convert.ToInt32(settings.Element("iDevice").Value);
-            boxVersion.SelectedIndex = Convert.ToInt32(settings.Element("Version").Value);
+            boxiDevice.SelectedIndex = settings.Element("iDevice").Value.ToInt32(-1);
+            boxVersion.SelectedIndex = settings.Element("Version").Value.ToInt32(-1);
 
             foreach (var source in settings.Elements("Source"))
             {
@@ -289,7 +333,7 @@ namespace Cygnus
         }
 
         /// <summary>
-        /// Auto-resizes Column widths of listSources and listPackages
+        /// Auto-resizes Column widths of ListViews and XPTables.
         /// </summary>
         /// <remarks>
         /// I had to increase Column.MaximumWidth property from 1024 to 8192 using XPTable source code...
@@ -299,9 +343,9 @@ namespace Cygnus
             this.listSources.Columns[0].Width = this.listSources.Width - 116; // Perfect constant
             this.listSources.Columns[1].AutoResize(ColumnHeaderAutoResizeStyle.HeaderSize);
 
-            this.tablePackages.ColumnModel.Columns[1].Width = this.tablePackages.Width - 41;
+            this.tablePackages.ColumnModel.Columns[1].Width = this.tablePackages.Width - 53;
 
-            this.tableChanges.ColumnModel.Columns[1].Width = this.tableChanges.Width - 41;
+            this.tableChanges.ColumnModel.Columns[0].Width = this.tableChanges.Width - 41;
 
             this.tableQueue.Refresh(); // this is necessary for some reason
             this.tableQueue.AutoResizeColumnWidths();
@@ -364,6 +408,7 @@ namespace Cygnus
             SaveXMLSettings();
         }
 
+
         /// <summary>
         /// Adds a "Package" to the tablePackages (XPTable).
         /// </summary>
@@ -371,12 +416,15 @@ namespace Cygnus
         private void UpdatePackagesTable(Package pack)
         {
             Row row = new Row() { Height = 18 };
-            row.Cells.Add(new Cell()); // using empty cell for now, I'm going to replace this with Cydia-like Section Icons
+            row.Cells.Add(new Cell());
             row.Cells.Add(new Cell(pack.Name, TitleStyle) { ForeColor = pack.Paid ? Color.Blue : Color.Black });
             this.tablePackages.TableModel.Rows.Add(row);
 
+            Bitmap sectionImage = SectionIcons.FirstOrDefault(x => pack.Section.Contains(x.Key)).Value;
+
             Row subrow = new Row();
-            subrow.Cells.Add(new Cell());
+            subrow.Cells.Add(new Cell(String.Empty, sectionImage) { Padding = new CellPadding(0, -16, 0, 0), ImageSizeMode = ImageSizeMode.NoClip });
+            // Overflow the bounds of the image to make it fit two rows instead of one.
             subrow.Cells.Add(new Cell("from {0} ({1})".FormatWith(pack.Repo.Label, pack.Section), SectionStyle));
             row.SubRows.Add(subrow);
 
@@ -708,7 +756,7 @@ namespace Cygnus
         private void openFolderToolStripMenuItem_Click(object sender, EventArgs e)
         {
             string packName = selectedQueue.TableRow.Cells[0].Text;
-            System.Diagnostics.Process.Start("explorer.exe", Path.Combine("debs", packName));
+            System.Diagnostics.Process.Start("explorer.exe", Path.Combine("debs", ValidFilename(packName)));
         }
 
         /// <summary>
@@ -738,8 +786,12 @@ namespace Cygnus
             System.Diagnostics.Process.Start("https://github.com/PythEch/Cygnus");
         }
 
+        private void splitContainer1_SplitterMoved(object sender, SplitterEventArgs e)
+        {
+            ResizeColumns();
+        }
+
         #endregion Methods
 
-        
     }
 }

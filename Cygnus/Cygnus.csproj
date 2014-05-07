@@ -98,6 +98,7 @@
     <Compile Include="AlertView.Designer.cs">
       <DependentUpon>AlertView.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="7za.exe" />
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -145,9 +146,6 @@
     <None Include="Resources\spinner.gif" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="7za.exe" />
-  </ItemGroup>
-  <ItemGroup>
     <COMReference Include="SHDocVw">
       <Guid>{EAB22AC0-30C1-11CF-A7EB-0000C05BAE0B}</Guid>
       <VersionMajor>1</VersionMajor>
@@ -160,7 +158,47 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Cygnus.ico" />
+    <EmbeddedResource Include="Sections\Addons.png" />
+    <EmbeddedResource Include="Sections\Administration.png" />
+    <EmbeddedResource Include="Sections\Archiving.png" />
+    <EmbeddedResource Include="Sections\Books.png" />
+    <EmbeddedResource Include="Sections\Carrier_Bundles.png" />
+    <EmbeddedResource Include="Sections\Data_Storage.png" />
+    <EmbeddedResource Include="Sections\Development.png" />
+    <EmbeddedResource Include="Sections\Dictionaries.png" />
+    <EmbeddedResource Include="Sections\Education.png" />
+    <EmbeddedResource Include="Sections\Entertainment.png" />
+    <EmbeddedResource Include="Sections\Fonts.png" />
+    <EmbeddedResource Include="Sections\Games.png" />
+    <EmbeddedResource Include="Sections\Health_and_Fitness.png" />
+    <EmbeddedResource Include="Sections\Java.png" />
+    <EmbeddedResource Include="Sections\Keyboards.png" />
+    <EmbeddedResource Include="Sections\Localization.png" />
+    <EmbeddedResource Include="Sections\Messaging.png" />
+    <EmbeddedResource Include="Sections\Multimedia.png" />
+    <EmbeddedResource Include="Sections\Navigation.png" />
+    <EmbeddedResource Include="Sections\Networking.png" />
+    <EmbeddedResource Include="Sections\Packaging.png" />
+    <EmbeddedResource Include="Sections\Productivity.png" />
+    <EmbeddedResource Include="Sections\Repositories.png" />
+    <EmbeddedResource Include="Sections\Ringtones.png" />
+    <EmbeddedResource Include="Sections\Scripting.png" />
+    <EmbeddedResource Include="Sections\Security.png" />
+    <EmbeddedResource Include="Sections\Site-Specific_Apps.png" />
+    <EmbeddedResource Include="Sections\Social.png" />
+    <EmbeddedResource Include="Sections\Soundboards.png" />
+    <EmbeddedResource Include="Sections\System.png" />
+    <EmbeddedResource Include="Sections\Terminal_Support.png" />
+    <EmbeddedResource Include="Sections\Text_Editors.png" />
+    <EmbeddedResource Include="Sections\Themes.png" />
+    <EmbeddedResource Include="Sections\Toys.png" />
+    <EmbeddedResource Include="Sections\Tweaks.png" />
+    <EmbeddedResource Include="Sections\Utilities.png" />
+    <EmbeddedResource Include="Sections\Wallpaper.png" />
+    <EmbeddedResource Include="Sections\Widgets.png" />
+    <EmbeddedResource Include="Sections\X_Window.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" />
   <Target Name="EnsureBclBuildImported" BeforeTargets="BeforeBuild" Condition="'$(BclBuildImported)' == ''">
