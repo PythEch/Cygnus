@@ -43,7 +43,8 @@ namespace Cygnus
         /// Cell styles are just like CSS of the XPTable.
         /// These are global because it's unnecessary to re-initialize them everytime.
         /// </summary>
-        private static readonly CellStyle TitleStyle = new CellStyle() { Font = new Font("Microsoft Sans Serif", 11) };
+        private static readonly CellStyle PaidTitleStyle = new CellStyle() { Font = new Font("Microsoft Sans Serif", 11), ForeColor = Color.Blue };
+        private static readonly CellStyle FreeTitleStyle = new CellStyle() { Font = new Font("Microsoft Sans Serif", 11), ForeColor = Color.Black };
         private static readonly CellStyle SectionStyle = new CellStyle() { Font = new Font("Microsoft Sans Serif", 7), ForeColor = Color.Gray };
         private static readonly CellStyle DescriptionStyle = new CellStyle() { ForeColor = Color.Blue };
 
@@ -229,9 +230,7 @@ namespace Cygnus
             settings.webBrowserPanelWidth = this.splitContainer1.Width - this.splitContainer1.SplitterDistance;
 
             if (this.WindowState != FormWindowState.Maximized)
-            {
                 settings.formSize = this.Size;
-            }
 
             settings.windowState = (this.WindowState == FormWindowState.Maximized) ? FormWindowState.Maximized : FormWindowState.Normal;
             settings.zoomFactor = trackBarZoom.Value;
@@ -243,19 +242,10 @@ namespace Cygnus
         /// </summary>
         private void LoadXMLSettings()
         {
-            if (!File.Exists("Cygnus.xml"))
-                SaveXMLSettings();
-
             this.listSources.Items.Clear();
             allRepos.Clear();
 
-            var settings = XDocument.Load("Cygnus.xml").Element("Settings");
-
-            txtUDID.Text = settings.Element("UDID").Value;
-            boxiDevice.SelectedIndex = settings.Element("iDevice").Value.ToInt32(-1);
-            boxVersion.SelectedIndex = settings.Element("Version").Value.ToInt32(-1);
-
-            foreach (var source in settings.Elements("Source"))
+            foreach (var source in XDocument.Load("Cygnus.xml").Element("Settings").Elements("Source"))
             {
                 string repoUrl = source.Element("URL").Value.toValidURL();
                 string key = URLToFilename(repoUrl);
@@ -270,6 +260,28 @@ namespace Cygnus
             }
         }
 
+        private void AddDefaultRepos()
+        {
+            foreach (string repoURL in new string[] { "http://apt.saurik.com/", "http://apt.thebigboss.org/repofiles/cydia/", "http://apt.modmyi.com/", "http://cydia.zodttd.com/repo/cydia/" })
+            {
+                DownloadCydiaIcon(repoURL);
+                string label = DownloadRelease(repoURL);
+
+                ListViewItem item = this.listSources.Items.Add(String.Empty);
+                item.Text = repoURL;
+                item.SubItems.Add("Please click 'Reload'");
+                item.Tag = label;
+
+                SaveXMLSettings();
+                LoadRepoIcons();    
+                LoadXMLSettings();
+            }
+
+            
+
+            ReloadData();
+        }
+
         /// <summary>
         /// Saves the repositories added by the user.
         /// </summary>
@@ -277,10 +289,6 @@ namespace Cygnus
         {
             XDocument doc = new XDocument(
                 new XElement("Settings",
-                    new XElement("UDID", txtUDID.Text),
-                    new XElement("iDevice", boxiDevice.SelectedIndex),
-                    new XElement("Version", boxVersion.SelectedIndex),
-
                     from ListViewItem item in this.listSources.Items
                     select new XElement("Source",
                         new XElement("URL", item.Text),
@@ -296,7 +304,7 @@ namespace Cygnus
         /// <summary>
         /// Inserts repo icons to listSources.
         /// </summary>
-        private void AddIcons()
+        private void LoadRepoIcons()
         {
             if (!Directory.Exists("repos")) return;
 
@@ -356,11 +364,13 @@ namespace Cygnus
         /// </summary>
         private void MainForm_Load(object sender, EventArgs e)
         {
-            AddIcons();
+            LoadRepoIcons();
 
             LoadUserSettings();
             ZoomWebBrowser(); // Formats the 'Zoom: {0}%' Label
-            LoadXMLSettings();
+
+            if (File.Exists("Cygnus.xml"))
+                LoadXMLSettings();
 
             this.statusStrip.Items.Add(new ToolStripControlHost(this.trackBarZoom));
             //Adds zoom trackbar which isn't possible to do with the Designer
@@ -386,6 +396,19 @@ namespace Cygnus
             ZoomWebBrowser();
 
             tabMain_SelectedIndexChanged(null, null);
+
+            if (!File.Exists("Cygnus.xml"))
+            {
+                if (MessageBox.Show("You are running Cygnus for the first time!\nDo you want to add default Cydia repositories?", 
+                        "Hi!", MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
+                {
+                    ShowLoadingView("Adding Repos", () =>
+                    {
+                        AddDefaultRepos();
+                    });
+                    
+                }
+            }
         }
 
         /// <summary>
@@ -394,9 +417,6 @@ namespace Cygnus
         private void MainForm_Resize(object sender, EventArgs e)
         {
             ResizeColumns();
-
-            optionsPanel.Left = (this.ClientSize.Width - optionsPanel.Width) / 2;
-            optionsPanel.Top = (this.ClientSize.Height - optionsPanel.Height) / 2 - 35;
         }
 
         /// <summary>
@@ -417,7 +437,7 @@ namespace Cygnus
         {
             Row row = new Row() { Height = 18 };
             row.Cells.Add(new Cell());
-            row.Cells.Add(new Cell(pack.Name, TitleStyle) { ForeColor = pack.Paid ? Color.Blue : Color.Black });
+            row.Cells.Add(new Cell(pack.Name, pack.Paid ? PaidTitleStyle : FreeTitleStyle));
             this.tablePackages.TableModel.Rows.Add(row);
 
             Bitmap sectionImage = SectionIcons.FirstOrDefault(x => pack.Section.Contains(x.Key)).Value;
@@ -443,8 +463,8 @@ namespace Cygnus
         private void UpdateChangesTable(Package pack)
         {
             Row row = new Row() { Height = 18 };
-            row.Cells.Add(new Cell()); // using empty cell for now, I'm going to replace this with Cydia-like Section Icons
-            row.Cells.Add(new Cell(pack.Name, TitleStyle) { ForeColor = pack.Paid ? Color.Blue : Color.Black });
+            row.Cells.Add(new Cell());
+            row.Cells.Add(new Cell(pack.Name, pack.Paid ? PaidTitleStyle : FreeTitleStyle));
             this.tableChanges.TableModel.Rows.Add(row);
 
             Row subrow = new Row();
@@ -466,7 +486,7 @@ namespace Cygnus
         private Queue UpdateQueueTable(string packName, Uri downloadUri)
         {
             Row row = new Row();
-            row.Cells.Add(new Cell(packName, TitleStyle)); // Package name text
+            row.Cells.Add(new Cell(packName, FreeTitleStyle)); // Package name text
             row.Cells.Add(new Cell()); // Progressbar
             this.tableQueue.TableModel.Rows.Add(row);
 
@@ -572,6 +592,8 @@ namespace Cygnus
         /// </remarks>
         private async void DownloadPackage(bool downloadDependencies)
         {
+            if (selectedPack.Pkg == null) return;
+
             Uri downloadUri = new Uri(new Uri(selectedPack.Repo.URL), selectedPack.Filename);
             string selectedPackName = selectedPack.Name;
             //Copy selectedPack locally to avoid problems with async
@@ -657,9 +679,7 @@ namespace Cygnus
             string depiction = selectedPack.Depiction;
 
             if (depiction.IsNullOrWhitespace())
-            {
                 depiction = new Uri(new Uri("http://cydia.saurik.com/package/"), selectedPack.Pkg).ToString();
-            }
 
             NavigateWebBrowser(depiction);
         }
@@ -744,7 +764,7 @@ namespace Cygnus
             allQueues.Remove(selectedQueue);
 
             int? progressBarPercentage = (int?)selectedQueue.TableRow.Cells[1].Data;
-            if (progressBarPercentage.HasValue && progressBarPercentage != 100)
+            if (progressBarPercentage != null && progressBarPercentage != 100)
             {
                 isDownloadCanceled = true;
                 statusBarProgressbar.Visible = statusLabelDownload.Visible = false;
@@ -765,9 +785,7 @@ namespace Cygnus
         private void listSources_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Delete)
-            {
                 this.btnDelete_Click(null, null);
-            }
         }
 
         /// <summary>
@@ -776,14 +794,7 @@ namespace Cygnus
         private void txtSearch_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
-            {
                 this.btnSearch_Click(null, null);
-            }
-        }
-
-        private void label5_Click(object sender, EventArgs e)
-        {
-            System.Diagnostics.Process.Start("https://github.com/PythEch/Cygnus");
         }
 
         private void splitContainer1_SplitterMoved(object sender, SplitterEventArgs e)

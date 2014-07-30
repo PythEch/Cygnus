@@ -74,17 +74,6 @@ namespace Cygnus
             this.tableQueue = new XPTable.Models.Table();
             this.pageChanges = new System.Windows.Forms.TabPage();
             this.tableChanges = new XPTable.Models.Table();
-            this.pageOptions = new System.Windows.Forms.TabPage();
-            this.label5 = new System.Windows.Forms.Label();
-            this.optionsPanel = new System.Windows.Forms.Panel();
-            this.txtUDID = new System.Windows.Forms.MaskedTextBox();
-            this.boxiDevice = new System.Windows.Forms.ComboBox();
-            this.label6 = new System.Windows.Forms.Label();
-            this.label1 = new System.Windows.Forms.Label();
-            this.boxVersion = new System.Windows.Forms.ComboBox();
-            this.label2 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
             this.trackBarZoom = new System.Windows.Forms.TrackBar();
             this.statusStrip = new System.Windows.Forms.StatusStrip();
             this.statusBarProgressbar = new System.Windows.Forms.ToolStripProgressBar();
@@ -107,8 +96,6 @@ namespace Cygnus
             ((System.ComponentModel.ISupportInitialize)(this.tableQueue)).BeginInit();
             this.pageChanges.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.tableChanges)).BeginInit();
-            this.pageOptions.SuspendLayout();
-            this.optionsPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarZoom)).BeginInit();
             this.statusStrip.SuspendLayout();
             this.contextMenuQueue.SuspendLayout();
@@ -120,7 +107,6 @@ namespace Cygnus
             this.tabMain.Controls.Add(this.pagePackages);
             this.tabMain.Controls.Add(this.pageQueue);
             this.tabMain.Controls.Add(this.pageChanges);
-            this.tabMain.Controls.Add(this.pageOptions);
             this.tabMain.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabMain.Location = new System.Drawing.Point(0, 0);
             this.tabMain.Name = "tabMain";
@@ -377,120 +363,6 @@ namespace Cygnus
             this.tableChanges.TabIndex = 1;
             this.tableChanges.UnfocusedBorderColor = System.Drawing.Color.Black;
             // 
-            // pageOptions
-            // 
-            this.pageOptions.Controls.Add(this.label5);
-            this.pageOptions.Controls.Add(this.optionsPanel);
-            this.pageOptions.Location = new System.Drawing.Point(4, 22);
-            this.pageOptions.Name = "pageOptions";
-            this.pageOptions.Padding = new System.Windows.Forms.Padding(3);
-            this.pageOptions.Size = new System.Drawing.Size(492, 322);
-            this.pageOptions.TabIndex = 4;
-            this.pageOptions.Text = "Options";
-            this.pageOptions.UseVisualStyleBackColor = true;
-            // 
-            // label5
-            // 
-            this.label5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.label5.AutoSize = true;
-            this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.label5.Location = new System.Drawing.Point(383, 288);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(109, 12);
-            this.label5.TabIndex = 12;
-            this.label5.Text = "Cygnus 0.5.2 by PythEch";
-            this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.label5.Click += new System.EventHandler(this.label5_Click);
-            // 
-            // optionsPanel
-            // 
-            this.optionsPanel.Controls.Add(this.txtUDID);
-            this.optionsPanel.Controls.Add(this.boxiDevice);
-            this.optionsPanel.Controls.Add(this.label6);
-            this.optionsPanel.Controls.Add(this.label1);
-            this.optionsPanel.Controls.Add(this.boxVersion);
-            this.optionsPanel.Controls.Add(this.label2);
-            this.optionsPanel.Controls.Add(this.label4);
-            this.optionsPanel.Controls.Add(this.label3);
-            this.optionsPanel.Location = new System.Drawing.Point(8, 6);
-            this.optionsPanel.Name = "optionsPanel";
-            this.optionsPanel.Size = new System.Drawing.Size(314, 180);
-            this.optionsPanel.TabIndex = 11;
-            // 
-            // txtUDID
-            // 
-            this.txtUDID.AsciiOnly = true;
-            this.txtUDID.Location = new System.Drawing.Point(56, 5);
-            this.txtUDID.Mask = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
-            this.txtUDID.Name = "txtUDID";
-            this.txtUDID.ResetOnSpace = false;
-            this.txtUDID.Size = new System.Drawing.Size(249, 20);
-            this.txtUDID.TabIndex = 11;
-            // 
-            // boxiDevice
-            // 
-            this.boxiDevice.FormattingEnabled = true;
-            this.boxiDevice.Location = new System.Drawing.Point(56, 64);
-            this.boxiDevice.Name = "boxiDevice";
-            this.boxiDevice.Size = new System.Drawing.Size(249, 21);
-            this.boxiDevice.TabIndex = 5;
-            // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.label6.Location = new System.Drawing.Point(54, 115);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(241, 60);
-            this.label6.TabIndex = 9;
-            this.label6.Text = resources.GetString("label6.Text");
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(13, 8);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(37, 13);
-            this.label1.TabIndex = 1;
-            this.label1.Text = "UDID:";
-            // 
-            // boxVersion
-            // 
-            this.boxVersion.FormattingEnabled = true;
-            this.boxVersion.Location = new System.Drawing.Point(56, 91);
-            this.boxVersion.Name = "boxVersion";
-            this.boxVersion.Size = new System.Drawing.Size(249, 21);
-            this.boxVersion.TabIndex = 7;
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.label2.Location = new System.Drawing.Point(54, 28);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(236, 24);
-            this.label2.TabIndex = 2;
-            this.label2.Text = "UDID will be used to download paid packages you own.\r\nCygnus does not send your U" +
-    "DID to any external server.";
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(5, 94);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(45, 13);
-            this.label4.TabIndex = 6;
-            this.label4.Text = "Version:";
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(4, 64);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(46, 13);
-            this.label3.TabIndex = 4;
-            this.label3.Text = "iDevice:";
-            // 
             // trackBarZoom
             // 
             this.trackBarZoom.AutoSize = false;
@@ -600,10 +472,6 @@ namespace Cygnus
             ((System.ComponentModel.ISupportInitialize)(this.tableQueue)).EndInit();
             this.pageChanges.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.tableChanges)).EndInit();
-            this.pageOptions.ResumeLayout(false);
-            this.pageOptions.PerformLayout();
-            this.optionsPanel.ResumeLayout(false);
-            this.optionsPanel.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarZoom)).EndInit();
             this.statusStrip.ResumeLayout(false);
             this.statusStrip.PerformLayout();
@@ -643,16 +511,5 @@ namespace Cygnus
         private System.Windows.Forms.ToolStripMenuItem deleteToolStripMenuItem;
         private System.Windows.Forms.ToolStripDropDownButton toolStripDropDownButton1;
         private System.Windows.Forms.ToolStripMenuItem openFolderToolStripMenuItem;
-        private System.Windows.Forms.TabPage pageOptions;
-        private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.Panel optionsPanel;
-        private System.Windows.Forms.MaskedTextBox txtUDID;
-        private System.Windows.Forms.ComboBox boxiDevice;
-        private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.ComboBox boxVersion;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.Label label3;
     }
 }

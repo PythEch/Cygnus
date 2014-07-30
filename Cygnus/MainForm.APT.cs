@@ -240,18 +240,6 @@ namespace Cygnus
             }
         }
 
-        private string GetUDID()
-        {
-            if (!this.txtUDID.Text.Contains(' ') && this.txtUDID.Text.Length == 40)
-            {
-                return this.txtUDID.Text;
-            }
-            // else ...
-            return "10aded70015040b4d455c1a551c411cec01ddeb5";
-            //Loaded tools for badass classical ice cold debs
-            //This is a bit forced though
-        }
-
         /// <summary>
         /// Downloads a file from web using an URL and a Stream.
         /// </summary>
@@ -262,8 +250,6 @@ namespace Cygnus
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
             request.Method = WebRequestMethods.Http.Get;
             request.UserAgent = "Telesphoreo APT-HTTP/1.0.592";
-            ////request.Headers.Add("X-Firmware", "7.0.2");
-            ////request.Headers.Add("X-Machine", "iPhone6,2");
             request.Headers.Add("X-Unique-ID", "10aded70015040b4d455c1a551c411cec01ddeb5");
 
             try
@@ -309,7 +295,7 @@ namespace Cygnus
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
             request.Method = WebRequestMethods.Http.Get;
             request.UserAgent = "Telesphoreo APT-HTTP/1.0.592";
-            request.Headers.Add("X-Unique-ID", GetUDID());
+            request.Headers.Add("X-Unique-ID", "10aded70015040b4d455c1a551c411cec01ddeb5");
 
             try
             {
@@ -344,8 +330,16 @@ namespace Cygnus
             }
             catch (WebException webEx)
             {
-                MessageBox.Show("An error occured while downloading from url: {0}\n\n{1}".FormatWith(uri.ToString(), webEx.Message),
+                if ((webEx.Response as HttpWebResponse).StatusCode == HttpStatusCode.Forbidden)
+                {
+                    MessageBox.Show("Sorry, you can't download paid packages with Cygnus :(\nYou should use Cydia instead...", 
+                        "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                else
+                {
+                    MessageBox.Show("An error occured while downloading from url: {0}\n\n{1}".FormatWith(uri.ToString(), webEx.Message),
                                 "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
 
             isDownloadCanceled = false;
@@ -503,7 +497,7 @@ namespace Cygnus
 
             foreach (var repo in allRepos)
             {
-                string filename = "repos\\" + URLToFilename(repo.URL) + ".Packages";
+                string filename = @"repos\{0}.Packages".FormatWith(URLToFilename(repo.URL));
 
                 if (!File.Exists(filename))
                 {
@@ -513,56 +507,16 @@ namespace Cygnus
 
                 Package pack = new Package();
 
-                var query = File.ReadLines(filename).Select(line => line.Split(new char[] { ':' }, 2));
-
-                foreach (var substrings in query)
+                foreach (var line in File.ReadLines(filename))
                 {
                     if (packages.Count >= 250) // Hardcoded limit
                         break;
 
-                    string key = substrings[0];
-
-                    if (substrings.Length == 2)
+                    if (line != String.Empty)
                     {
-                        string value = substrings[1].Trim();
-
-                        switch (key.Trim())
-                        {
-                            case "Package":
-                                pack.Pkg = value;
-                                break;
-                            case "Name":
-                                pack.Name = value;
-                                break;
-                            case "Version":
-                                pack.Version = value;
-                                break;
-                            case "Description":
-                                pack.Description = value;
-                                break;
-                            case "Filename":
-                                pack.Filename = value;
-                                break;
-                            case "Section":
-                                pack.Section = value.Replace('_', ' ');
-                                // Weird section name choices... Sometimes the space is replaced with underscore instead
-                                break;
-                            case "Pre-Depends":
-                            case "Depends":
-                                pack.Depends = (pack.Depends == null) ? value : (pack.Depends + "," + value);
-                                break;
-                            case "MD5sum":
-                                pack.MD5sum = value;
-                                break;
-                            case "Depiction":
-                                pack.Depiction = value;
-                                break;
-                            case "Tag":
-                                pack.Paid = value.Contains("cydia::commercial");
-                                break;
-                        }
+                        ParsePackage(line, ref pack);
                     }
-                    else if (key.IsNullOrWhitespace())
+                    else
                     {
                         if (!pack.Name.IsNullOrWhitespace() && pack.Name.ContainsIgnoreCase(packageNameToSearch))
                         {
@@ -572,14 +526,9 @@ namespace Cygnus
 
                         pack = new Package();
                     }
-                } // end foreach (var substrings in query)
-
-                // Add the last one if we missed one
-                if (!pack.Pkg.IsNullOrWhitespace() && !pack.Name.IsNullOrWhitespace() && pack.Name.ContainsIgnoreCase(packageNameToSearch))
-                {
-                    packages.Add(pack);
+                    
                 }
-            } // end foreach (var repo in allRepos)
+            }
 
             return packages;
         }
@@ -597,17 +546,11 @@ namespace Cygnus
         /// </remarks>
         private static Package SearchPackagesByID(string packageIDToSearch)
         {
-            packageIDToSearch = packageIDToSearch.ToLowerInvariant();
-
             Package pack = new Package();
-
-            bool found = false;
 
             foreach (var repo in allRepos)
             {
-                if (found) break;
-
-                string filename = "repos\\" + URLToFilename(repo.URL) + ".Packages";
+                string filename = @"repos\{0}.Packages".FormatWith(URLToFilename(repo.URL));
 
                 if (!File.Exists(filename))
                 {
@@ -617,67 +560,71 @@ namespace Cygnus
 
                 foreach (var line in File.ReadLines(filename))
                 {
-                    if (!found)
+                    if (line != String.Empty)
                     {
-                        if (line.StartsWith("Package:") && line.Substring(9) == packageIDToSearch)
-                        {
-                            found = true;
-                            pack.Pkg = packageIDToSearch;
-                        }
+                        ParsePackage(line, ref pack);
                     }
                     else
                     {
-                        string[] substrings = line.Split(new char[] { ':' }, 2);
-
-                        if (substrings.Length != 2)
+                        if (pack.Pkg == packageIDToSearch)
                         {
-                            // End of Package
                             pack.Repo = repo;
-                            break;
+                            return pack;
                         }
 
-                        string key = substrings[0].Trim();
-                        string value = substrings[1].Trim();
-
-                        switch (key)
-                        {
-                            case "Package":
-                                pack.Pkg = value;
-                                break;
-                            case "Name":
-                                pack.Name = value;
-                                break;
-                            case "Version":
-                                pack.Version = value;
-                                break;
-                            case "Description":
-                                pack.Description = value;
-                                break;
-                            case "Filename":
-                                pack.Filename = value;
-                                break;
-                            case "Section":
-                                pack.Section = value;
-                                break;
-                            case "Pre-Depends":
-                            case "Depends":
-                                pack.Depends = (pack.Depends == null) ? value : (pack.Depends + "," + value);
-                                break;
-                            case "MD5sum":
-                                pack.MD5sum = value;
-                                break;
-                            case "Depiction":
-                                pack.Depiction = value;
-                                break;
-                            case "Tag":
-                                pack.Paid = value.Contains("cydia::commercial");
-                                break;
-                        }
+                        pack = new Package();
                     }
+                    
                 }
             }
 
-            return pack;
+            return pack; //oops, could not found, maybe i should return null...
+        }
+
+        private static void ParsePackage(string line, ref Package pack)
+        {
+            string[] substrings = line.Split(new char[] { ':' }, 2);
+            if (substrings.Length != 2 || line[0] == ' ')
+                return;
+            string key = substrings[0].Trim().ToLowerInvariant();
+            string value = substrings[1].Trim();
+
+            switch (key)
+            {
+                case "package":
+                    pack.Pkg = value;
+                    break;
+                case "name":
+                    pack.Name = value;
+                    break;
+                case "version":
+                    pack.Version = value;
+                    break;
+                case "description":
+                    pack.Description = value;
+                    break;
+                case "filename":
+                    pack.Filename = value;
+                    break;
+                case "section":
+                    pack.Section = value.Replace('_', ' ');
+                    // Weird section name choices... Sometimes the space is replaced with underscore instead
+                    break;
+                case "pre-depends":
+                case "depends":
+                    pack.Depends = (pack.Depends == null) ? value : (pack.Depends + "," + value);
+                    break;
+                case "md5sum":
+                    pack.MD5sum = value;
+                    break;
+                case "depiction":
+                    pack.Depiction = value;
+                    break;
+                case "tag":
+                    pack.Paid = value.Contains("cydia::commercial");
+                    break;
+            }
+
         }
 
         /// <summary>
@@ -749,7 +696,6 @@ namespace Cygnus
 
             Uri uri = new Uri(url);
 
-
             if (allRepos.Any(x => x.URL == uri.ToString()))
             {
                 MessageBox.Show("The repository you've entered already exists!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -769,10 +715,10 @@ namespace Cygnus
             if (verified)
             {
                 item.Text = uri.ToString();
-                item.SubItems.Add("?"); // FIXME: Calculate number of packages.
+                item.SubItems.Add("Please click 'Reload'");
                 item.Tag = label;
                 SaveXMLSettings();
-                AddIcons();
+                LoadRepoIcons();
                 LoadXMLSettings();
             }
             else
@@ -844,13 +790,9 @@ namespace Cygnus
         /// </summary>
         private struct Package
         {
-            #region Fields
-
             public bool Paid;
             public string Pkg, Name, Version, Description, Depends, Filename, Section, MD5sum, Depiction;
             public Repo Repo;
-
-            #endregion Fields
         }
 
         /// <summary>
@@ -859,40 +801,13 @@ namespace Cygnus
         /// </summary>
         private struct FastPackage
         {
-            #region Fields
-
             public string Pkg, Version;
-
-            #endregion Fields
         }
 
         private class Queue
         {
-            #region Fields
-
             public Uri DownloadUri;
             public Row TableRow;
-
-            #endregion Fields
-
-            #region Methods
-
-            /*public override int GetHashCode()
-            {
-                return DownloadUri.GetHashCode() ^ TableRow.GetHashCode();
-            }
-
-            public override bool Equals(object obj)
-            {
-                if (obj == null) return false;
-                if (!(obj is Queue)) return false;
-
-                Queue other = (Queue)obj;
-
-                return other.DownloadUri == DownloadUri && other.TableRow == TableRow;
-            }*/
-
-            #endregion Methods
         }
 
         /// <summary>
@@ -904,11 +819,7 @@ namespace Cygnus
         /// </remarks>
         private class Repo
         {
-            #region Fields
-
             public string URL, Label;
-
-            #endregion Fields
         }
 
         #endregion Nested Types
