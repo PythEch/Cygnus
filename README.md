@@ -1,4 +1,4 @@
-# Cygnus
+# <img src="Cygnus/Cygnus.ico" height=40>&nbsp;Cygnus 
 
 Cydia-like APT Client for Windows.
 
